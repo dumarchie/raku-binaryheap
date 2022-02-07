@@ -1,0 +1,128 @@
+use v6.c;
+use Test;
+plan 5;
+
+use lib 'lib';
+use BinaryHeap;
+
+sub values-ok(\heap, \values, $desc = '.values') {
+    is-deeply heap.values, values.Seq, $desc;
+}
+
+subtest 'create a heap', {
+    subtest 'create an empty heap', {
+        my $heap = BinaryHeap.new;
+        does-ok $heap, BinaryHeap, 'BinaryHeap.new';
+        is $heap.Bool, False, '.Bool';
+        is $heap.top, Nil, '.top';
+        values-ok $heap, Empty;
+    }
+
+    subtest 'create a heap from a single value', {
+        my $heap = BinaryHeap.new(Mu);
+        does-ok $heap, BinaryHeap, 'BinaryHeap.new(Mu)';
+        is $heap.Bool, True, '.Bool';
+        is $heap.top, Mu, '.top';
+        values-ok $heap, (Mu,);
+    }
+
+    subtest 'create a heap from a list of values', {
+        my \values = (25, 17, 36, 2, 19, 7, 3, 1, 100);
+        my $heap = BinaryHeap.new(values);
+        does-ok $heap, BinaryHeap, 'BinaryHeap.new(values)';
+        values-ok $heap, (1, 2, 3, 17, 19, 7, 36, 25, 100);
+    }
+
+    subtest 'create a heap from an itemized Slip', {
+        my $slip = slip(25, 17, 36, 2, 19, 7, 3, 1, 100);
+        my $heap = BinaryHeap.new($slip);
+        does-ok $heap, BinaryHeap, 'BinaryHeap.new($slip)';
+        values-ok $heap, (1, 2, 3, 17, 19, 7, 36, 25, 100);
+    }
+};
+
+subtest 'push onto a heap', {
+    subtest 'push a single value onto an empty heap', {
+        my $heap  = BinaryHeap.new;
+        cmp-ok $heap.push(Mu), '===', $heap, '.push(Mu) returns the heap';
+        values-ok $heap, (Mu,), 'heap includes the provided value';
+    }
+
+    subtest 'push multiple values onto a heap', {
+        my $heap = BinaryHeap.new(25, 17, 36);
+        cmp-ok $heap.push(2, 19, 7, 3, 1, 100), '===', $heap,
+          '.push(2, 19, 7, 3, 1, 100) returns the heap';
+
+        values-ok $heap, (1, 2, 3, 17, 19, 36, 7, 25, 100),
+          'heap includes the provided values';
+    }
+
+    subtest 'push a Slip onto a heap', {
+        my $heap = BinaryHeap.new(25, 17, 36);
+        my $slip = slip(2, 19, 7, 3, 1, 100);
+        cmp-ok $heap.push($slip), '===', $heap, '.push($slip) returns the heap';
+        values-ok $heap, (1, 2, 3, 17, 19, 36, 7, 25, 100),
+          'heap includes the elements of the provided Slip';
+    }
+};
+
+subtest 'replace the top of a heap', {
+    subtest 'replace into an empty heap', {
+        my $heap = BinaryHeap.new;
+        is $heap.replace(Mu), Nil, '.replace(value) returns Nil';
+        values-ok $heap, (Mu,), 'heap contains the provided value';
+    };
+
+    subtest 'replace the top of a non-empty heap with a Slip', {
+        my $heap = BinaryHeap.new(Mu);
+        my $slip = slip(1, 2);
+        is $heap.replace($slip), Mu, '.replace($slip) returns the original top';
+        is-deeply $heap.top, $slip, 'new top is the provided Slip';
+    };
+
+    subtest 'sift down a lower-precedence value', {
+        my $heap = BinaryHeap.new(1, 2, 3, 5, 4, 7, 6, 10, 9, 8);
+        is $heap.replace(11), 1, '.replace(value) returns the original top';
+        values-ok $heap, (2, 4, 3, 5, 8, 7, 6, 10, 9, 11),
+          'heap contains the provided value instead';
+    };
+};
+
+subtest 'pop a value from a heap', {
+    fails-like { BinaryHeap.new.pop },
+      X::Cannot::Empty, :action<pop>, :what<BinaryHeap>,
+      'pop from an empty heap';
+
+    subtest 'pop from a heap containing a single value', {
+        my $heap = BinaryHeap.new(Mu);
+        is $heap.pop, Mu, '.pop returns the top';
+        values-ok $heap, Empty, 'heap is empty';
+    };
+
+    subtest 'pop from a heap containing multiple values', {
+        my $heap = BinaryHeap.new(25, 17, 7, 2, 19, 36, 3, 1, 100);
+        is $heap.pop, 1, '.pop returns the original top';
+        values-ok $heap, (2, 17, 3, 25, 19, 36, 7, 100),
+          'heap no longer contains the original top';
+    };
+};
+
+subtest 'push-pop', {
+    subtest 'push-pop when heap is empty', {
+        my $heap = BinaryHeap.new;
+        is $heap.push-pop(Mu), Mu, '.push-pop(Mu) returns the provided value';
+        values-ok $heap, Empty, 'heap remains empty';
+    };
+
+    subtest 'push-pop when provided value precedes top', {
+        my $heap = BinaryHeap.new(1, 2);
+        is $heap.push-pop(0), 0, '.push-pop(value) returns the provided value';
+        values-ok $heap, (1, 2), 'heap remains the same';
+    };
+
+    subtest 'push-pop when top precedes provided value', {
+        my $heap = BinaryHeap.new(1, 2);
+        is $heap.push-pop(42), 1, '.push-pop(value) returns the old top';
+        values-ok $heap, (2, 42), 'heap contains the provided value instead';
+    };
+};

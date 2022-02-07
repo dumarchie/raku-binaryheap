@@ -1,0 +1,19 @@
+{
+    "perl" : "6.c",
+    "name" : "BinaryHeap",
+    "api"  : "1",
+    "auth" : "github:dumarchie",
+    "version" : "0.0.1",
+    "description" : "Array-based binary heap",
+    "authors" : [ "Peter du Marchie van Voorthuysen" ],
+    "license" : "Artistic-2.0",
+    "provides" : {
+        "BinaryHeap" : "lib/BinaryHeap.rakumod"
+    },
+    "depends" : [ ],
+    "build-depends" : [ ],
+    "test-depends" : [ ],
+    "resources" : [ ],
+    "tags": [ "heap" ],
+    "source-url" : "git://github.com/dumarchie/raku-binaryheap.git"
+}

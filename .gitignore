@@ -1,0 +1,7 @@
+# precompiled files
+.precomp
+lib/.precomp
+
+# ignore benchmarks of alternative implementations and benchmark logs
+benchmark/heap-*
+benchmark/*.log
