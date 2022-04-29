@@ -2,7 +2,7 @@
     "perl" : "6.c",
     "name" : "BinaryHeap",
     "api"  : "1",
-    "auth" : "github:dumarchie",
+    "auth" : "zef:dumarchie",
     "version" : "0.0.1",
     "description" : "Array-based binary heap",
     "authors" : [ "Peter du Marchie van Voorthuysen" ],
