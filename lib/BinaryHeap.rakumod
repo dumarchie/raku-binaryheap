@@ -99,14 +99,18 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
     # Insert values into a heap
     proto method push(BinaryHeap:D: |) {*}
     multi method push(BinaryHeap:D: **@values is raw --> BinaryHeap:D) {
-        self.push($_) for @values;
+        self!insert($_) for @values;
         self;
     }
     multi method push(BinaryHeap:D: Slip \values --> BinaryHeap:D) {
-        self.push($_) for values;
+        self!insert($_) for values;
         self;
     }
     multi method push(BinaryHeap:D: Mu \value --> BinaryHeap:D) {
+        self!insert(value);
+        self;
+    }
+    method !insert(Mu \value --> Nil) {
         # sift the provided value up from a new node
         my $node := @!array[my int $pos = $!elems++];
         while $pos > 0
@@ -116,7 +120,6 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
             $node := parent;
         }
         $node = value;
-        self;
     }
 
     # Insert, then extract
