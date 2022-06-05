@@ -23,6 +23,20 @@ Role `BinaryHeap` stores values in an implicit binary tree that satisfies the **
 
 Infix `precedes` defines a priority relation, such that the root of the tree, known as the [top](#method_top) of the heap, has a priority higher than or equal to all other nodes of the tree. The default relation defines a *min heap*, i.e. the top value compares `Less` than or `Same` as every other value on the heap.
 
+Module `BinaryHeap` provides two classes that mix in the role:
+
+  * `class BinaryHeap::MaxHeap does BinaryHeap[* cmp * == More]`
+
+    In a *max-heap*, a child node never compares [More](More) than its parent node.
+
+  * `class BinaryHeap::MinHeap does BinaryHeap[* cmp * == Less]`
+
+    In a *min-heap*, a child node never compares [Less](Less) than its parent node.
+
+These classes are parameterizable with a custom comparison routine. For example, this max-heap compares objects by their `.key`:
+
+    my BinaryHeap::MaxHeap[*.key cmp *.key] $heap;
+
 METHODS
 =======
 
@@ -58,9 +72,14 @@ method push
 
 Defined as:
 
-    method push(BinaryHeap:D: **@values is raw --> BinaryHeap:D)
+    method push(BinaryHeap: **@values is raw --> BinaryHeap:D)
 
-Inserts the provided values into the heap and returns the modified heap.
+Inserts the provided values into the heap and returns the modified heap. Tries to autovivify the invocant if called on an undefined invocant. For example:
+
+    my BinaryHeap::MaxHeap $heap;
+    $heap.push(42, 11);
+    say $heap.pop; # OUTPUT: «42␤»
+    say $heap.top; # OUTPUT: «11␤»
 
 method push-pop
 ---------------

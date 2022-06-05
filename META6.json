@@ -3,14 +3,16 @@
     "name" : "BinaryHeap",
     "api"  : "1",
     "auth" : "zef:dumarchie",
-    "version" : "0.0.1",
+    "version" : "0.0.2",
     "description" : "Array-based binary heap",
     "authors" : [ "Peter du Marchie van Voorthuysen" ],
     "license" : "Artistic-2.0",
     "provides" : {
         "BinaryHeap" : "lib/BinaryHeap.rakumod"
     },
-    "depends" : [ ],
+    "depends" : [
+        "Parameterizable:auth<zef:dumarchie>"
+    ],
     "build-depends" : [ ],
     "test-depends" : [ ],
     "resources" : [ ],

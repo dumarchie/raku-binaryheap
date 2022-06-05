@@ -1,3 +1,6 @@
+# Roles cannot autovivify, so we need parameterizable classes
+use Parameterizable;
+
 # A BinaryHeap is an implicit binary tree that satisfies the heap property:
 # the value of a node never precedes the value of its parent node
 proto sub infix:<precedes>($, $) {*}
@@ -97,7 +100,10 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
     }
 
     # Insert values into a heap
-    proto method push(BinaryHeap:D: |) {*}
+    proto method push(BinaryHeap: |) {*}
+    multi method push(BinaryHeap:U \SELF: **@values is raw --> BinaryHeap:D) {
+        SELF = SELF.CREATE.push(|@values);
+    }
     multi method push(BinaryHeap:D: **@values is raw --> BinaryHeap:D) {
         self!insert($_) for @values;
         self;
@@ -144,13 +150,27 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
         }
     }
 
-    multi method Bool(BinaryHeap:D: --> Bool:D) { $!elems > 0 }
+    multi method Bool(::?CLASS::D: --> Bool:D) { $!elems > 0 }
     method top(BinaryHeap:D:) { $!elems > 0 ?? @!array[0] !! Nil }
 
     # Allow introspection, but do not return containers:
-    multi method values(BinaryHeap:D: --> Seq:D) {
+    multi method values(::?CLASS:D: --> Seq:D) {
         my int $i;
         gather while $i < $!elems { take @!array[$i++] }
+    }
+}
+
+class BinaryHeap::MaxHeap does BinaryHeap[* cmp * == More] is Parameterizable {
+    method MIXIN(&infix:<cmp>) {
+        my &precedes = * cmp * == More;
+        BinaryHeap[&precedes];
+    }
+}
+
+class BinaryHeap::MinHeap does BinaryHeap[* cmp * == Less] is Parameterizable {
+    method MIXIN(&infix:<cmp>) {
+        my &precedes = * cmp * == Less;
+        BinaryHeap[&precedes];
     }
 }
 
@@ -182,6 +202,25 @@ Infix C<precedes> defines a priority relation, such that the root of the tree,
 known as the L<top|#method_top> of the heap, has a priority higher than or equal
 to all other nodes of the tree. The default relation defines a I<min heap>, i.e.
 the top value compares C<Less> than or C<Same> as every other value on the heap.
+
+Module C<BinaryHeap> provides two classes that mix in the role:
+
+=begin item
+C<class BinaryHeap::MaxHeap does BinaryHeap[* cmp * == More]>
+
+In a I<max-heap>, a child node never compares L<More> than its parent node.
+=end item
+
+=begin item
+C<class BinaryHeap::MinHeap does BinaryHeap[* cmp * == Less]>
+
+In a I<min-heap>, a child node never compares L<Less> than its parent node.
+=end item
+
+These classes are parameterizable with a custom comparison routine. For example,
+this max-heap compares objects by their C<.key>:
+
+    my BinaryHeap::MaxHeap[*.key cmp *.key] $heap;
 
 =head1 METHODS
 
@@ -215,9 +254,15 @@ or returns a C<Failure> if the heap is empty.
 
 Defined as:
 
-    method push(BinaryHeap:D: **@values is raw --> BinaryHeap:D)
+    method push(BinaryHeap: **@values is raw --> BinaryHeap:D)
 
-Inserts the provided values into the heap and returns the modified heap.
+Inserts the provided values into the heap and returns the modified heap. Tries
+to autovivify the invocant if called on an undefined invocant. For example:
+
+    my BinaryHeap::MaxHeap $heap;
+    $heap.push(42, 11);
+    say $heap.pop; # OUTPUT: «42␤»
+    say $heap.top; # OUTPUT: «11␤»
 
 =head2 method push-pop
 

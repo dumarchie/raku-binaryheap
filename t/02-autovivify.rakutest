@@ -1,0 +1,43 @@
+use v6.c;
+use Test;
+plan 4;
+
+use lib 'lib';
+use BinaryHeap;
+
+sub values-ok(\heap, \values, $desc = '.values') {
+    is-deeply heap.values, values.Seq, $desc;
+}
+
+my \values = 25, 17, 36, 2, 19, 7, 3, 1, 100;
+subtest 'Push onto an undefined max-heap', {
+    my BinaryHeap::MaxHeap $heap;
+    is $heap.raku, 'BinaryHeap::MaxHeap', 'my BinaryHeap::MaxHeap $heap';
+    is $heap.push(|values), $heap, '$heap.push(|values)';
+    values-ok $heap, (100, 36, 25, 19, 17, 7, 3, 1, 2);
+};
+
+subtest 'Push onto an undefined max-heap with custom comparison', {
+    my BinaryHeap::MaxHeap[-> $, $ { Same }] $heap;
+    is $heap.raku, 'BinaryHeap::MaxHeap[Block]',
+     'my BinaryHeap::MaxHeap[-> $, $ { Same }] $heap';
+
+    is $heap.push(|values), $heap, '$heap.push(|values)';
+    values-ok $heap, values;
+};
+
+subtest 'Push onto an undefined min-heap', {
+    my BinaryHeap::MinHeap $heap;
+    is $heap.raku, 'BinaryHeap::MinHeap', 'my BinaryHeap::MinHeap $heap';
+    is $heap.push(|values), $heap, '$heap.push(|values)';
+    values-ok $heap, (1, 2, 3, 17, 19, 36, 7, 25, 100);
+};
+
+subtest 'Push onto an undefined min-heap with custom comparison', {
+    my BinaryHeap::MinHeap[-> $, $ { Same }] $heap;
+    is $heap.raku, 'BinaryHeap::MinHeap[Block]',
+     'my BinaryHeap::MinHeap[-> $, $ { Same }] $heap';
+
+    is $heap.push(|values), $heap, '$heap.push(|values)';
+    values-ok $heap, values;
+};
