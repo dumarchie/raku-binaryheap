@@ -2,6 +2,9 @@
 .precomp
 lib/.precomp
 
-# ignore benchmarks of alternative implementations and benchmark logs
+# distributions
+sdist
+
+# benchmarks of alternative implementations and benchmark logs
 benchmark/heap-*
 benchmark/*.log

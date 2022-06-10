@@ -72,9 +72,9 @@ method push
 
 Defined as:
 
-    method push(BinaryHeap: **@values is raw --> BinaryHeap:D)
+    method push(**@values is raw --> BinaryHeap:D)
 
-Inserts the provided values into the heap and returns the modified heap. Tries to autovivify the invocant if called on an undefined invocant. For example:
+Inserts the provided values into the heap and returns the modified heap. Autovivifies the invocant if called on a container storing or defaulting to a class type object. For example:
 
     my BinaryHeap::MaxHeap $heap;
     $heap.push(42, 11);

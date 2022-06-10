@@ -100,9 +100,9 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
     }
 
     # Insert values into a heap
-    proto method push(BinaryHeap: |) {*}
-    multi method push(BinaryHeap:U \SELF: **@values is raw --> BinaryHeap:D) {
-        SELF = SELF.CREATE.push(|@values);
+    proto method push(|) {*}
+    multi method push(::?CLASS:U $_ is rw: **@values is raw --> BinaryHeap:D) {
+        $_ = self.CREATE.push(|@values);
     }
     multi method push(BinaryHeap:D: **@values is raw --> BinaryHeap:D) {
         self!insert($_) for @values;
@@ -254,10 +254,11 @@ or returns a C<Failure> if the heap is empty.
 
 Defined as:
 
-    method push(BinaryHeap: **@values is raw --> BinaryHeap:D)
+    method push(**@values is raw --> BinaryHeap:D)
 
-Inserts the provided values into the heap and returns the modified heap. Tries
-to autovivify the invocant if called on an undefined invocant. For example:
+Inserts the provided values into the heap and returns the modified heap.
+Autovivifies the invocant if called on a container storing or defaulting to a
+class type object. For example:
 
     my BinaryHeap::MaxHeap $heap;
     $heap.push(42, 11);
