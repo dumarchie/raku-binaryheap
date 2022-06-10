@@ -49,24 +49,24 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
     method !sift-down(int $pos is copy --> Nil) {
         my @path;
         my $node := @!array[$pos];
-        @path[my int $path-end] := $node;
+        @path.BIND-POS(my int $path-end, $node);
 
         my int $heap-end = $!elems - 1;
         while ($pos = ($pos * 2) + 1) < $heap-end {
             my \left  = @!array[$pos];
             my \right = @!array[$pos + 1];
             if left precedes right {
-                @path[++$path-end] := left;
+                @path.BIND-POS(++$path-end, left);
             }
             else {
                 $pos += 1;
-                @path[++$path-end] := right;
+                @path.BIND-POS(++$path-end, right);
             }
         }
 
         # at the deepest level there may be only one child
         if $pos == $heap-end {
-            @path[++$path-end] := @!array[$pos];
+            @path.BIND-POS(++$path-end, @!array[$pos]);
         }
 
         # shorten the path until the final node can hold the value of the first
