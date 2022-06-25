@@ -161,6 +161,10 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
             Empty.Seq;
         }
     }
+
+    multi sub infix:<eqv>(BinaryHeap \a, BinaryHeap \b --> Bool:D) is export {
+        a.WHAT === b.WHAT && a.values eqv b.values;
+    }
 }
 
 class BinaryHeap::MaxHeap does BinaryHeap[* cmp * == More] is Parameterizable {
@@ -234,6 +238,21 @@ I<class> type. For example, given the uninitialized C<$heap> declared above:
     say $heap.values;      # OUTPUT: «()␤»
     say $heap.replace(42); # OUTPUT: «Nil␤»
     say $heap.top;         # OUTPUT: «42␤»
+
+=head1 EXPORTS
+
+=head2 infix eqv
+
+Defined as:
+
+    multi sub infix:<eqv>(BinaryHeap \a, BinaryHeap \b --> Bool:D)
+
+Returns C<True> if and only if the two heaps are of the same type and contain
+equivalent L<values|#method_values>. Note that a concrete heap is of a different
+type than a role, so:
+
+    say BinaryHeap.new eqv BinaryHeap;                   # OUTPUT: «False␤»
+    say BinaryHeap::MaxHeap.new eqv BinaryHeap::MaxHeap; # OUTPUT: «True␤»
 
 =head1 METHODS
 

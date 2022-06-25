@@ -43,6 +43,21 @@ An uninitialized `BinaryHeap` is a valid representation of an empty heap. This m
     say $heap.replace(42); # OUTPUT: «Nil␤»
     say $heap.top;         # OUTPUT: «42␤»
 
+EXPORTS
+=======
+
+infix eqv
+---------
+
+Defined as:
+
+    multi sub infix:<eqv>(BinaryHeap \a, BinaryHeap \b --> Bool:D)
+
+Returns `True` if and only if the two heaps are of the same type and contain equivalent [values](#method_values). Note that a concrete heap is of a different type than a role, so:
+
+    say BinaryHeap.new eqv BinaryHeap;                   # OUTPUT: «False␤»
+    say BinaryHeap::MaxHeap.new eqv BinaryHeap::MaxHeap; # OUTPUT: «True␤»
+
 METHODS
 =======
 

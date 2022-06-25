@@ -1,0 +1,14 @@
+use v6.c;
+use Test;
+plan 1;
+
+use lib 'lib';
+use BinaryHeap;
+
+subtest 'infix eqv', {
+    is BinaryHeap.new eqv BinaryHeap, False,
+      'BinaryHeap.new eqv BinaryHeap';
+
+    is BinaryHeap::MaxHeap.new eqv BinaryHeap::MaxHeap, True,
+      'BinaryHeap::MaxHeap.new eqv BinaryHeap::MaxHeap';
+}

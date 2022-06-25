@@ -1,4 +1,6 @@
-0.0.2 2022-04-29
-    Provide parameterizable MaxHeap and MinHeap classes that autovivify
+0.0.3 2022-06-25
+    - Make an uninitialized heap equivalent to an empty heap of the same type
+0.0.2 2022-06-05
+    - Provide parameterizable MaxHeap and MinHeap classes that autovivify
 0.0.1 2022-04-29
-    Initial release
+    - Initial release
