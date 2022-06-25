@@ -108,7 +108,10 @@ subtest 'pop a value from a heap', {
 };
 
 subtest 'push-pop', {
-    subtest 'push-pop when heap is empty', {
+    is BinaryHeap.push-pop(Mu), Mu,
+      'BinaryHeap.push-pop(Mu) returns the provided value';
+
+    subtest 'push-pop when heap instance is empty', {
         my $heap = BinaryHeap.new;
         is $heap.push-pop(Mu), Mu, '.push-pop(Mu) returns the provided value';
         values-ok $heap, Empty, 'heap remains empty';

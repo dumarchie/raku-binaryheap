@@ -1,6 +1,6 @@
 use v6.c;
 use Test;
-plan 4;
+plan 5;
 
 use lib 'lib';
 use BinaryHeap;
@@ -41,3 +41,9 @@ subtest 'Push onto an undefined min-heap with custom comparison', {
     is $heap.push(|values), $heap, '$heap.push(|values)';
     values-ok $heap, values;
 };
+
+subtest 'Replace the top of an undefined heap', {
+    my BinaryHeap::MaxHeap $heap;
+    is $heap.replace(42), Nil, '$heap.replace(new) returns Nil';
+    values-ok $heap, (42,);
+}

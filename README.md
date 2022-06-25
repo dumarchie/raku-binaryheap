@@ -21,19 +21,19 @@ DESCRIPTION
 
 Role `BinaryHeap` stores values in an implicit binary tree that satisfies the **heap property**: the value of a node never `precedes` the value of its parent node.
 
-Infix `precedes` defines a priority relation, such that the root of the tree, known as the [top](#method_top) of the heap, has a priority higher than or equal to all other nodes of the tree. The default relation defines a *min heap*, i.e. the top value compares `Less` than or `Same` as every other value on the heap.
+Infix `precedes` defines a priority relation, such that the root of the tree, known as the [top](#method_top) of the heap, has a priority higher than or equal to all other nodes of the tree. The default relation defines a *min-heap*, i.e. the top value compares `Less` than or `Same` as every other value on the heap.
 
 Module `BinaryHeap` provides two classes that mix in the role:
 
   * `class BinaryHeap::MaxHeap does BinaryHeap[* cmp * == More]`
 
-    In a *max-heap*, a child node never compares [More](More) than its parent node.
+    In a *max-heap*, a child node never compares `More` than its parent node.
 
   * `class BinaryHeap::MinHeap does BinaryHeap[* cmp * == Less]`
 
-    In a *min-heap*, a child node never compares [Less](Less) than its parent node.
+    In a *min-heap*, a child node never compares `Less` than its parent node.
 
-These classes are parameterizable with a custom comparison routine. For example, this max-heap compares objects by their `.key`:
+These classes are parameterizable with a custom three-way comparison operation. For example, this *max-heap* compares objects by their `.key`:
 
     my BinaryHeap::MaxHeap[*.key cmp *.key] $heap;
 
@@ -72,7 +72,7 @@ method push
 
 Defined as:
 
-    method push(**@values is raw --> BinaryHeap:D)
+    method push(**@values --> BinaryHeap:D)
 
 Inserts the provided values into the heap and returns the modified heap. Autovivifies the invocant if called on a container storing or defaulting to a class type object. For example:
 
@@ -86,18 +86,18 @@ method push-pop
 
 Defined as:
 
-    method push-pop(BinaryHeap:D: Mu \value)
+    method push-pop(Mu \value)
 
-Functionally equivalent, but more efficient than a [push](#method_push) followed by a [pop](#method_pop). [Replaces the top](#method_replace) of the heap if it precedes the provided value; otherwise returns the provided value.
+Functionally equivalent, but more efficient than a [push](#method_push) followed by a [pop](#method_pop). [Replaces the top](#method_replace) of the heap if it `precedes` the provided value; otherwise just returns the provided value.
 
 method replace
 --------------
 
 Defined as:
 
-    method replace(BinaryHeap:D: Mu \new)
+    method replace(Mu \new)
 
-Functionally equivalent, but more efficient than a [pop](#method_pop) followed by a [push](#method_push). Replaces the [top](#method_top) of the heap with the new value and returns the old value, or `Nil` if the heap was empty.
+Functionally equivalent, but more efficient than a [pop](#method_pop) followed by a [push](#method_push). Removes the [top](#method_top) of the heap and returns it after inserting the new value.
 
 method top
 ----------

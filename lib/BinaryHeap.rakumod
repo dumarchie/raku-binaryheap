@@ -129,15 +129,13 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
     }
 
     # Insert, then extract
-    method push-pop(BinaryHeap:D: Mu \value) {
-        $!elems > 0 && @!array[0] precedes value
-          ?? self.replace(value)
-          !! value;
+    method push-pop(Mu \value) {
+        self && @!array[0] precedes value ?? self.replace(value) !! value;
     }
 
     # Replace the top of a heap (extract, then insert)
-    method replace(BinaryHeap:D: Mu \new) {
-        if $!elems > 0 {
+    method replace(\SELF: Mu \new) {
+        if self {
             my $node := @!array[0];
             my $old = $node;
             $node = new;
@@ -145,12 +143,12 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
             $old;
         }
         else {
-            @!array[$!elems++] = new;
+            SELF.push(new);
             Nil;
         }
     }
 
-    multi method Bool(::?CLASS::D: --> Bool:D) { $!elems > 0 }
+    multi method Bool(BinaryHeap:D: --> Bool:D) { $!elems > 0 }
     method top(BinaryHeap:D:) { $!elems > 0 ?? @!array[0] !! Nil }
 
     # Allow introspection, but do not return containers:
@@ -200,7 +198,7 @@ node.
 
 Infix C<precedes> defines a priority relation, such that the root of the tree,
 known as the L<top|#method_top> of the heap, has a priority higher than or equal
-to all other nodes of the tree. The default relation defines a I<min heap>, i.e.
+to all other nodes of the tree. The default relation defines a I<min-heap>, i.e.
 the top value compares C<Less> than or C<Same> as every other value on the heap.
 
 Module C<BinaryHeap> provides two classes that mix in the role:
@@ -208,17 +206,17 @@ Module C<BinaryHeap> provides two classes that mix in the role:
 =begin item
 C<class BinaryHeap::MaxHeap does BinaryHeap[* cmp * == More]>
 
-In a I<max-heap>, a child node never compares L<More> than its parent node.
+In a I<max-heap>, a child node never compares C<More> than its parent node.
 =end item
 
 =begin item
 C<class BinaryHeap::MinHeap does BinaryHeap[* cmp * == Less]>
 
-In a I<min-heap>, a child node never compares L<Less> than its parent node.
+In a I<min-heap>, a child node never compares C<Less> than its parent node.
 =end item
 
-These classes are parameterizable with a custom comparison routine. For example,
-this max-heap compares objects by their C<.key>:
+These classes are parameterizable with a custom three-way comparison operation.
+For example, this I<max-heap> compares objects by their C<.key>:
 
     my BinaryHeap::MaxHeap[*.key cmp *.key] $heap;
 
@@ -254,7 +252,7 @@ or returns a C<Failure> if the heap is empty.
 
 Defined as:
 
-    method push(**@values is raw --> BinaryHeap:D)
+    method push(**@values --> BinaryHeap:D)
 
 Inserts the provided values into the heap and returns the modified heap.
 Autovivifies the invocant if called on a container storing or defaulting to a
@@ -269,21 +267,22 @@ class type object. For example:
 
 Defined as:
 
-    method push-pop(BinaryHeap:D: Mu \value)
+    method push-pop(Mu \value)
 
 Functionally equivalent, but more efficient than a L<push|#method_push>
 followed by a L<pop|#method_pop>. L<Replaces the top|#method_replace> of the
-heap if it precedes the provided value; otherwise returns the provided value.
+heap if it C<precedes> the provided value; otherwise just returns the provided
+value.
 
 =head2 method replace
 
 Defined as:
 
-    method replace(BinaryHeap:D: Mu \new)
+    method replace(Mu \new)
 
 Functionally equivalent, but more efficient than a L<pop|#method_pop> followed
-by a L<push|#method_push>. Replaces the L<top|#method_top> of the heap with the
-new value and returns the old value, or C<Nil> if the heap was empty.
+by a L<push|#method_push>. Removes the L<top|#method_top> of the heap and
+returns it after inserting the new value.
 
 =head2 method top
 
