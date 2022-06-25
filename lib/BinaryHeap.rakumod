@@ -88,8 +88,8 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
     }
 
     # Extract a value from a heap
-    method pop(BinaryHeap:D:) is nodal {
-        if $!elems > 0 {
+    method pop() {
+        if self {
             my $value = @!array[--$!elems]:delete;
             $!elems > 0 ?? self.replace($value) !! $value;
         }
@@ -243,7 +243,7 @@ Creates a new heap instance. The provided values are stored in heap order.
 
 Defined as:
 
-    method pop(BinaryHeap:D:) is nodal
+    method pop()
 
 Removes the value stored at the L<top|#method_top> of the heap and returns it,
 or returns a C<Failure> if the heap is empty.

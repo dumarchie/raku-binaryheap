@@ -89,6 +89,10 @@ subtest 'replace the top of a heap', {
 };
 
 subtest 'pop a value from a heap', {
+    fails-like { BinaryHeap.pop },
+      X::Cannot::Empty, :action<pop>, :what<BinaryHeap>,
+      'pop from an uninitialized heap';
+
     fails-like { BinaryHeap.new.pop },
       X::Cannot::Empty, :action<pop>, :what<BinaryHeap>,
       'pop from an empty heap';

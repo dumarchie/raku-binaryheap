@@ -63,7 +63,7 @@ method pop
 
 Defined as:
 
-    method pop(BinaryHeap:D:) is nodal
+    method pop()
 
 Removes the value stored at the [top](#method_top) of the heap and returns it, or returns a `Failure` if the heap is empty.
 
