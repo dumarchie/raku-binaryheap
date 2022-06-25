@@ -1,12 +1,18 @@
 use v6.c;
 use Test;
-plan 5;
+plan 6;
 
 use lib 'lib';
 use BinaryHeap;
 
 sub values-ok(\heap, \values, $desc = '.values') {
     is-deeply heap.values, values.Seq, $desc;
+}
+
+subtest 'uninitialized heap', {
+    is BinaryHeap.Bool, False, '.Bool';
+    is BinaryHeap.top, Nil, '.top';
+    values-ok BinaryHeap, Empty;
 }
 
 subtest 'create a heap', {

@@ -37,6 +37,12 @@ These classes are parameterizable with a custom three-way comparison operation. 
 
     my BinaryHeap::MaxHeap[*.key cmp *.key] $heap;
 
+An uninitialized `BinaryHeap` is a valid representation of an empty heap. This means that all documented methods can be called on a type object. Methods that may add values to the heap try to autovivify an uninitialized invocant, which means they can only be called on a *container* that stores or defaults to a *class* type. For example, given the uninitialized `$heap` declared above:
+
+    say $heap.values;      # OUTPUT: «()␤»
+    say $heap.replace(42); # OUTPUT: «Nil␤»
+    say $heap.top;         # OUTPUT: «42␤»
+
 METHODS
 =======
 
@@ -45,7 +51,7 @@ method Bool
 
 Defined as:
 
-    multi method Bool(BinaryHeap:D: --> Bool:D)
+    method Bool( --> Bool:D)
 
 Returns `True` if the heap contains at least one node, and `False` if the heap is empty.
 
@@ -104,14 +110,16 @@ method top
 
 Defined as:
 
-    method top(BinaryHeap:D:)
+    method top()
 
 Returns the value stored at the top of the heap, or `Nil` if the heap is empty.
 
 method values
 -------------
 
-    multi method values(BinaryHeap:D: --> Seq:D)
+Defined as:
+
+    method values( --> Seq:D)
 
 Returns a `Seq` of the values encountered during a breadth-first traversal of the heap.
 

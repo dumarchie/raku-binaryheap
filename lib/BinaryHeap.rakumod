@@ -148,13 +148,18 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
         }
     }
 
-    multi method Bool(BinaryHeap:D: --> Bool:D) { $!elems > 0 }
-    method top(BinaryHeap:D:) { $!elems > 0 ?? @!array[0] !! Nil }
+    method Bool( --> Bool:D) { self.defined && $!elems > 0 }
+    method top() { self ?? @!array[0] !! Nil }
 
     # Allow introspection, but do not return containers:
-    multi method values(::?CLASS:D: --> Seq:D) {
-        my int $i;
-        gather while $i < $!elems { take @!array[$i++] }
+    method values( --> Seq:D) {
+        if self {
+            my int $i;
+            gather while $i < $!elems { take @!array[$i++] }
+        }
+        else {
+            Empty.Seq;
+        }
     }
 }
 
@@ -220,13 +225,23 @@ For example, this I<max-heap> compares objects by their C<.key>:
 
     my BinaryHeap::MaxHeap[*.key cmp *.key] $heap;
 
+An uninitialized C<BinaryHeap> is a valid representation of an empty heap. This
+means that all documented methods can be called on a type object. Methods that
+may add values to the heap try to autovivify an uninitialized invocant, which
+means they can only be called on a I<container> that stores or defaults to a
+I<class> type. For example, given the uninitialized C<$heap> declared above:
+
+    say $heap.values;      # OUTPUT: «()␤»
+    say $heap.replace(42); # OUTPUT: «Nil␤»
+    say $heap.top;         # OUTPUT: «42␤»
+
 =head1 METHODS
 
 =head2 method Bool
 
 Defined as:
 
-    multi method Bool(BinaryHeap:D: --> Bool:D)
+    method Bool( --> Bool:D)
 
 Returns C<True> if the heap contains at least one node, and C<False> if the
 heap is empty.
@@ -288,13 +303,15 @@ returns it after inserting the new value.
 
 Defined as:
 
-    method top(BinaryHeap:D:)
+    method top()
 
 Returns the value stored at the top of the heap, or C<Nil> if the heap is empty.
 
 =head2 method values
 
-    multi method values(BinaryHeap:D: --> Seq:D)
+Defined as:
+
+    method values( --> Seq:D)
 
 Returns a C<Seq> of the values encountered during a breadth-first traversal of
 the heap.
