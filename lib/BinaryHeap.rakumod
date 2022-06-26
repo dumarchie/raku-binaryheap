@@ -10,6 +10,16 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
     # the array may contain additional elements to accommodate a heapsort.
     has @!array;
     has int $!elems;
+    method !SET-SELF(@!array) {
+        $!elems = @!array.elems;
+        self;
+    }
+
+    # Clone a concrete heap
+    multi method clone(BinaryHeap:D: --> BinaryHeap:D) {
+        my @copy = @!array.head($!elems);
+        self.CREATE!SET-SELF(@copy);
+    }
 
     # Construct a heap with zero or more values
     proto method new(|) {*}
@@ -264,6 +274,15 @@ Defined as:
 
 Returns C<True> if the heap contains at least one node, and C<False> if the
 heap is empty.
+
+=head2 method clone
+
+Defined as:
+
+    multi method clone(BinaryHeap:D: --> BinaryHeap:D)
+
+Returns a clone of the invocant. The clone is based on a distinct array, so
+modifications to one heap will not affect the other heap.
 
 =head2 method new
 

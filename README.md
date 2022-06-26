@@ -70,6 +70,15 @@ Defined as:
 
 Returns `True` if the heap contains at least one node, and `False` if the heap is empty.
 
+method clone
+------------
+
+Defined as:
+
+    multi method clone(BinaryHeap:D: --> BinaryHeap:D)
+
+Returns a clone of the invocant. The clone is based on a distinct array, so modifications to one heap will not affect the other heap.
+
 method new
 ----------
 

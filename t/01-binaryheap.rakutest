@@ -1,6 +1,6 @@
 use v6.c;
 use Test;
-plan 6;
+plan 7;
 
 use lib 'lib';
 use BinaryHeap;
@@ -139,3 +139,12 @@ subtest 'push-pop', {
         values-ok $heap, (2, 42), 'heap contains the provided value instead';
     };
 };
+
+subtest 'clone', {
+    my $heap  = BinaryHeap.new(1, 2);
+    my $heap2 = $heap.clone;
+    values-ok $heap2, (1, 2), '.clone returns a heap storing the same values';
+
+    $heap.pop;
+    values-ok $heap2, (1, 2), 'the values are stored in a distinct array';
+}
