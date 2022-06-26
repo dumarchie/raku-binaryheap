@@ -10,7 +10,8 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
     # the array may contain additional elements to accommodate a heapsort.
     has @!array;
     has int $!elems;
-    method !SET-SELF(@!array) {
+    method !SET-SELF(@array) {
+        @!array := @array;
         $!elems = @!array.elems;
         self;
     }
@@ -23,28 +24,14 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
 
     # Construct a heap with zero or more values
     proto method new(|) {*}
-    multi method new( --> BinaryHeap:D) { self.CREATE }
-    multi method new(Mu \arg --> BinaryHeap:D) {
-        self.CREATE.STORE(arg);
-    }
-    multi method new(Slip:D \values --> BinaryHeap:D) {
-        self.CREATE.STORE(values<>);
-    }
-    multi method new(**@values is raw --> BinaryHeap:D) {
-        self.CREATE.STORE(@values);
-    }
+    multi method new(        --> BinaryHeap:D) { self.CREATE }
+    multi method new(+values --> BinaryHeap:D) { self.heapify(values.Array) }
 
-    proto method STORE(BinaryHeap:D: |) {*}
-    multi method STORE(BinaryHeap:D: Mu \value --> BinaryHeap:D) {
-        @!array = value;
-        $!elems = 1;
-        self;
+    # Heapify an array
+    method heapify(@array --> BinaryHeap:D) {
+        self.CREATE!SET-SELF(@array)!HEAPIFY;
     }
-    multi method STORE(BinaryHeap:D: Iterable:D \values --> BinaryHeap:D) {
-        @!array = values;
-        $!elems = @!array.elems;
-
-        # heapify
+    method !HEAPIFY() {
         my int $pos = ($!elems - 2) div 2; # last internal node
         self!sift-down($pos--) while $pos >= 0;
         self;
@@ -284,13 +271,23 @@ Defined as:
 Returns a clone of the invocant. The clone is based on a distinct array, so
 modifications to one heap will not affect the other heap.
 
+=head2 method heapify
+
+Defined as:
+
+    method heapify(@array --> BinaryHeap:D)
+
+Constructs a new heap based on the provided array, whose elements are put in
+heap order. The C<@array> should not be modified directly while the heap is in
+use.
+
 =head2 method new
 
 Defined as:
 
     method new(+values --> BinaryHeap:D)
 
-Creates a new heap instance. The provided values are stored in heap order.
+Constructs a new heap storing the provided values.
 
 =head2 method pop
 

@@ -79,6 +79,15 @@ Defined as:
 
 Returns a clone of the invocant. The clone is based on a distinct array, so modifications to one heap will not affect the other heap.
 
+method heapify
+--------------
+
+Defined as:
+
+    method heapify(@array --> BinaryHeap:D)
+
+Constructs a new heap based on the provided array, whose elements are put in heap order. The `@array` should not be modified directly while the heap is in use.
+
 method new
 ----------
 
@@ -86,7 +95,7 @@ Defined as:
 
     method new(+values --> BinaryHeap:D)
 
-Creates a new heap instance. The provided values are stored in heap order.
+Constructs a new heap storing the provided values.
 
 method pop
 ----------
