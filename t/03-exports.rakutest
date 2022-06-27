@@ -1,6 +1,6 @@
 use v6.c;
 use Test;
-plan 1;
+plan 5;
 
 use lib 'lib';
 use BinaryHeap;
@@ -11,4 +11,37 @@ subtest 'infix eqv', {
 
     is BinaryHeap::MaxHeap.new eqv BinaryHeap::MaxHeap, True,
       'BinaryHeap::MaxHeap.new eqv BinaryHeap::MaxHeap';
+}
+
+my \values = 25, 17, 36, 2, 19, 7, 3, 1, 100;
+subtest 'heapsort', {
+    my @array = values;
+    is heapsort(@array), @array,
+      'heapsort(@array) returns the array';
+    is-deeply @array, values.sort.Array,
+      'the array elements are sorted in ascending order';
+}
+
+subtest 'reverse heapsort', {
+    my @array = values;
+    is heapsort(@array, :reverse), @array,
+      'heapsort(@array, :reverse) returns the array';
+    is-deeply @array, values.sort.reverse.Array,
+      'the array elements are sorted in descending order';
+}
+
+subtest 'heapsort with custom comparator', {
+    my @array = values;
+    is heapsort(-(* cmp *), @array), @array,
+      'heapsort(-(* cmp *), @array) returns the array';
+    is-deeply @array, values.sort.reverse.Array,
+      'the array elements are put in descending order';
+}
+
+subtest 'reverse heapsort with custom comparator', {
+    my @array = values;
+    is heapsort(-(* cmp *), @array, :reverse), @array,
+      'heapsort(-(* cmp *), @array, :reverse) returns the array';
+    is-deeply @array, values.sort.Array,
+      'the array elements are put in ascending order';
 }

@@ -145,6 +145,16 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
         }
     }
 
+    proto method sort(|) {*}
+    multi method sort(BinaryHeap:U:) { self.CREATE.sort }
+    multi method sort(BinaryHeap:D:) {
+        while $!elems > 1 {
+            my $node := @!array[--$!elems];
+            $node = self.replace($node);
+        }
+        @!array;
+    }
+
     method Bool( --> Bool:D) { self.defined && $!elems > 0 }
     method top() { self ?? @!array[0] !! Nil }
 
@@ -178,18 +188,29 @@ class BinaryHeap::MinHeap does BinaryHeap[* cmp * == Less] is Parameterizable {
     }
 }
 
+proto sub heapsort(|) is export {*}
+multi sub heapsort(@array, :$reverse) {
+    my \heap = $reverse ?? BinaryHeap::MinHeap !! BinaryHeap::MaxHeap;
+    heap.heapify(@array).sort;
+}
+multi sub heapsort(&cmp, @array, :$reverse) {
+    my \heap = $reverse ?? BinaryHeap::MinHeap !! BinaryHeap::MaxHeap;
+    heap.^parameterize(&cmp).heapify(@array).sort;
+}
+
 =begin pod
 
 =head1 NAME
 
-BinaryHeap - Array-based binary heap
+BinaryHeap - Array-based binary heap supporting heapsort
 
 =head1 SYNOPSIS
 
 =begin code :lang<raku>
 use BinaryHeap;
 
-my $heap = BinaryHeap.new(42, 11);
+my BinaryHeap::MinHeap $heap;
+$heap.push(42, 11);
 say $heap.pop; # OUTPUT: «11␤»
 say $heap.top; # OUTPUT: «42␤»
 =end code
@@ -221,7 +242,7 @@ C<class BinaryHeap::MinHeap does BinaryHeap[* cmp * == Less]>
 In a I<min-heap>, a child node never compares C<Less> than its parent node.
 =end item
 
-These classes are parameterizable with a custom three-way comparison operation.
+These classes are parameterizable with a custom three-way comparison operator.
 For example, this I<max-heap> compares objects by their C<.key>:
 
     my BinaryHeap::MaxHeap[*.key cmp *.key] $heap;
@@ -250,6 +271,24 @@ type than a role, so:
 
     say BinaryHeap.new eqv BinaryHeap;                   # OUTPUT: «False␤»
     say BinaryHeap::MaxHeap.new eqv BinaryHeap::MaxHeap; # OUTPUT: «True␤»
+
+=head2 sub heapsort
+
+Defined as:
+
+    multi sub heapsort(@array, :$reverse)
+    multi sub heapsort(&comparator, @array, :$reverse)
+
+Sorts and returns the C<@array>, using a custom three-way C<&comparator> if
+provided. By default the array is sorted in ascending order, but it is sorted in
+descending order if C<:$reverse> is true. Hence, the following statements both
+put the elements of the array in descending order:
+
+    heapsort @array, :reverse;
+    heapsort -(* cmp *), @array;
+
+Note that C<heapsort> is not a L<stable
+sort|https://en.wikipedia.org/wiki/Sorting_algorithm#Stability>.
 
 =head1 METHODS
 
@@ -334,6 +373,15 @@ Functionally equivalent, but more efficient than a L<pop|#method_pop> followed
 by a L<push|#method_push>. Removes the L<top|#method_top> of the heap and
 returns it after inserting the new value.
 
+=head2 method sort
+
+Defined as:
+
+    method sort()
+
+Sorts and returns the underlying array. When this method returns the heap
+contains at most one value, the C<.head> of the array.
+
 =head2 method top
 
 Defined as:
@@ -354,6 +402,11 @@ the heap.
 =head1 SEE ALSO
 
 =item L<Binary heap - Wikipedia|https://en.wikipedia.org/wiki/Binary_heap>
+
+=item L<Heapsort - Wikipedia|https://en.wikipedia.org/wiki/Heapsort>
+
+=item L<Raku's built-in C<sort> routine|https://docs.raku.org/routine/sort>,
+which is faster than a L<C<heapsort>|#sub_heapsort> on Rakudo.
 
 =head1 AUTHOR
 

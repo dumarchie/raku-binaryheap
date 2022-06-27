@@ -3,7 +3,7 @@
     "name" : "BinaryHeap",
     "api"  : "1",
     "auth" : "zef:dumarchie",
-    "version" : "0.0.4",
+    "version" : "0.0.5",
     "description" : "Array-based binary heap",
     "authors" : [ "Peter du Marchie van Voorthuysen" ],
     "license" : "Artistic-2.0",
@@ -16,6 +16,6 @@
     "build-depends" : [ ],
     "test-depends" : [ ],
     "resources" : [ ],
-    "tags": [ "heap" ],
+    "tags": [ "heap", "heapsort" ],
     "source-url" : "git://github.com/dumarchie/raku-binaryheap.git"
 }

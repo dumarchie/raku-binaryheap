@@ -1,7 +1,7 @@
 NAME
 ====
 
-BinaryHeap - Array-based binary heap
+BinaryHeap - Array-based binary heap supporting heapsort
 
 SYNOPSIS
 ========
@@ -9,7 +9,8 @@ SYNOPSIS
 ```raku
 use BinaryHeap;
 
-my $heap = BinaryHeap.new(42, 11);
+my BinaryHeap::MinHeap $heap;
+$heap.push(42, 11);
 say $heap.pop; # OUTPUT: «11␤»
 say $heap.top; # OUTPUT: «42␤»
 ```
@@ -33,7 +34,7 @@ Module `BinaryHeap` provides two classes that mix in the role:
 
     In a *min-heap*, a child node never compares `Less` than its parent node.
 
-These classes are parameterizable with a custom three-way comparison operation. For example, this *max-heap* compares objects by their `.key`:
+These classes are parameterizable with a custom three-way comparison operator. For example, this *max-heap* compares objects by their `.key`:
 
     my BinaryHeap::MaxHeap[*.key cmp *.key] $heap;
 
@@ -57,6 +58,21 @@ Returns `True` if and only if the two heaps are of the same type and contain equ
 
     say BinaryHeap.new eqv BinaryHeap;                   # OUTPUT: «False␤»
     say BinaryHeap::MaxHeap.new eqv BinaryHeap::MaxHeap; # OUTPUT: «True␤»
+
+sub heapsort
+------------
+
+Defined as:
+
+    multi sub heapsort(@array, :$reverse)
+    multi sub heapsort(&comparator, @array, :$reverse)
+
+Sorts and returns the `@array`, using a custom three-way `&comparator` if provided. By default the array is sorted in ascending order, but it is sorted in descending order if `:$reverse` is true. Hence, the following statements both put the elements of the array in descending order:
+
+    heapsort @array, :reverse;
+    heapsort -(* cmp *), @array;
+
+Note that `heapsort` is not a [stable sort](https://en.wikipedia.org/wiki/Sorting_algorithm#Stability).
 
 METHODS
 =======
@@ -138,6 +154,15 @@ Defined as:
 
 Functionally equivalent, but more efficient than a [pop](#method_pop) followed by a [push](#method_push). Removes the [top](#method_top) of the heap and returns it after inserting the new value.
 
+method sort
+-----------
+
+Defined as:
+
+    method sort()
+
+Sorts and returns the underlying array. When this method returns the heap contains at most one value, the `.head` of the array.
+
 method top
 ----------
 
@@ -160,6 +185,10 @@ SEE ALSO
 ========
 
   * [Binary heap - Wikipedia](https://en.wikipedia.org/wiki/Binary_heap)
+
+  * [Heapsort - Wikipedia](https://en.wikipedia.org/wiki/Heapsort)
+
+  * [Raku's built-in `sort` routine](https://docs.raku.org/routine/sort), which is faster than a [`heapsort`](#sub_heapsort) on Rakudo.
 
 AUTHOR
 ======

@@ -7,4 +7,8 @@ sdist
 
 # benchmarks of alternative implementations and benchmark logs
 benchmark/heap-*
+benchmark/sort.raku
 benchmark/*.log
+
+# profiles
+profile-*.html
