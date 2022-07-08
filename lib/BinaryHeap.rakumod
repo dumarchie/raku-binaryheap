@@ -146,13 +146,15 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
     }
 
     proto method sort(|) {*}
-    multi method sort(BinaryHeap:U:) { self.CREATE.sort }
+    multi method sort(BinaryHeap:U:) { Array.new }
     multi method sort(BinaryHeap:D:) {
+        my @array := @!array;
         while $!elems > 1 {
-            my $node := @!array[--$!elems];
+            my $node := @array[--$!elems];
             $node = self.replace($node);
         }
-        @!array;
+        self!SET-SELF(@array.new);
+        @array;
     }
 
     method Bool( --> Bool:D) { self.defined && $!elems > 0 }
@@ -379,8 +381,10 @@ Defined as:
 
     method sort()
 
-Sorts and returns the underlying array. When this method returns the heap
-contains at most one value, the C<.head> of the array.
+Returns an empty C<Array> if called on an uninitialized heap. Otherwise sorts
+the underlying array in descending order if called on a I<min-heap>, in
+ascending order if called on a I<max-heap>. Replaces the underlying array with
+an empty copy and returns the sorted array.
 
 =head2 method top
 

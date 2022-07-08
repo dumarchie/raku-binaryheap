@@ -1,6 +1,6 @@
 use v6.c;
 use Test;
-plan 8;
+plan 9;
 
 use lib 'lib';
 use BinaryHeap;
@@ -13,6 +13,7 @@ subtest 'uninitialized heap', {
     is BinaryHeap.Bool, False, '.Bool';
     is BinaryHeap.top, Nil, '.top';
     values-ok BinaryHeap, Empty;
+    is-deeply BinaryHeap.sort, [], '.sort returns an empty Array';
 }
 
 subtest 'create a heap', {
@@ -155,4 +156,24 @@ subtest 'heapify', {
     is-deeply @array, [1, 2], '.heapify(@array) puts the @array in heap order';
     does-ok $heap, BinaryHeap, 'the return value is a heap';
     values-ok $heap, @array, 'the heap is based on the @array';
+
+    # TODO: assert that
+    # * an attempt to push an invalid value does not modify the array
+    # * .pop does the right thing if the array does not support .DELETE-POS
+}
+
+subtest 'sort the values on a heap', {
+    my int @array = 25, 17, 36, 2, 19, 7, 3, 1, 100;
+    my $heap = BinaryHeap.heapify(@array);
+
+    my \got = $heap.sort;
+    my int @expected = @array.sort.reverse;
+    is-deeply got, @expected,
+      '.sort returns the underlying array with values in descending order';
+
+    nok $heap, 'the heap is empty';
+    $heap.push(0);
+    is-deeply got, @expected, 'the heap is now based on a distinct array';
+    dies-ok { $heap.push('naught') },
+      'the new underlying array has the same constraints as the original';
 }

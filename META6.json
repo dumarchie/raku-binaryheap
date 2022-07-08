@@ -3,7 +3,7 @@
     "name" : "BinaryHeap",
     "api"  : "1",
     "auth" : "zef:dumarchie",
-    "version" : "0.0.5",
+    "version" : "0.0.6",
     "description" : "Array-based binary heap",
     "authors" : [ "Peter du Marchie van Voorthuysen" ],
     "license" : "Artistic-2.0",

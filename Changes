@@ -1,7 +1,9 @@
+0.0.6 2022-06-27
+    - Improve the behavior of the .sort method
 0.0.5 2022-06-27
-    - Provide heapsort routine
+    - Export sub heapsort
 0.0.4 2022-06-26
-    - Provide heapify and clone methods
+    - Provide .heapify and .clone methods
 0.0.3 2022-06-25
     - Make an uninitialized heap equivalent to an empty heap of the same type
 0.0.2 2022-06-05

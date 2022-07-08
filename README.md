@@ -161,7 +161,7 @@ Defined as:
 
     method sort()
 
-Sorts and returns the underlying array. When this method returns the heap contains at most one value, the `.head` of the array.
+Returns an empty `Array` if called on an uninitialized heap. Otherwise sorts the underlying array in descending order if called on a *min-heap*, in ascending order if called on a *max-heap*. Replaces the underlying array with an empty copy and returns the sorted array.
 
 method top
 ----------
