@@ -114,8 +114,12 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
         self;
     }
     method !insert(Mu \value --> Nil) {
-        # sift the provided value up from a new node
-        my $node := @!array[my int $pos = $!elems++];
+        # increment $!elems only if the value can be assigned to a new node
+        my $node := @!array[$!elems];
+        $node = value;
+        my int $pos = $!elems++;
+
+        # sift the provided value up from the new node
         while $pos > 0
           && value precedes my \parent = @!array[$pos = ($pos - 1) div 2]
         {

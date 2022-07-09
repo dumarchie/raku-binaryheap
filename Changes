@@ -1,5 +1,6 @@
 0.0.6 2022-06-27
     - Improve the behavior of the .sort method
+    - Improve behavior and performance of the .push method
 0.0.5 2022-06-27
     - Export sub heapsort
 0.0.4 2022-06-26
