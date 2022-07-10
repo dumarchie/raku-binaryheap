@@ -151,23 +151,25 @@ subtest 'clone', {
 }
 
 subtest 'heapify', {
-    my int @array = 25, 17, 36, 2, 19, 7, 3, 1, 100;
+    my int @array[9] = 25, 17, 36, 2, 19, 7, 3, 1, 100;
     my $heap = BinaryHeap.heapify(@array);
 
-    my int @heapified = 1, 2, 3, 17, 19, 7, 36, 25, 100;
+    my int @heapified[9] = 1, 2, 3, 17, 19, 7, 36, 25, 100;
     is-deeply @array, @heapified,
       '.heapify(@array) puts the elements of @array in heap order';
 
     does-ok $heap, BinaryHeap, 'the return value is a heap';
     values-ok $heap, @heapified, 'the heap is based on the @array';
 
-    subtest 'push a value that is not accepted by the array', {
-        dies-ok { $heap.push('naught') }, '.push(value) dies';
+    subtest 'pop when array does not support it', {
+        dies-ok { $heap.pop }, '.pop dies';
         values-ok $heap, @heapified, 'the heap is not modified';
     };
 
-    # TODO: assert that .pop does not throw
-    # if the array does not support .DELETE-POS
+    subtest 'push when array does not support it', {
+        dies-ok { $heap.push(0) }, '.push(value) dies';
+        values-ok $heap, @heapified, 'the heap is not modified';
+    };
 }
 
 subtest 'sort the values on a heap', {

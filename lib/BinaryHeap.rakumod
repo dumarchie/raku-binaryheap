@@ -87,8 +87,8 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
     # Extract a value from a heap
     method pop() {
         if self {
-            my $value = @!array[--$!elems]:delete;
-            $!elems > 0 ?? self.replace($value) !! $value;
+            my $value = @!array[$!elems - 1]:delete;
+            --$!elems > 0 ?? self.replace($value) !! $value;
         }
         else {
             Failure.new:
