@@ -10,6 +10,7 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
     # the array may contain additional elements to accommodate a heapsort.
     has @!array;
     has int $!elems;
+    has @!path; # reusable path for sift-down
     method !SET-SELF(@array) {
         @!array := @array;
         $!elems = @!array.elems;
@@ -44,38 +45,37 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
     # violating the heap condition. Then assign each node in the path the value
     # of its successor, and assign the final node the value of the first node.
     method !sift-down(int $pos is copy --> Nil) {
-        my @path;
         my $node := @!array[$pos];
-        @path.BIND-POS(my int $path-end, $node);
+        @!path.BIND-POS(my int $path-end, $node);
 
         my int $heap-end = $!elems - 1;
         while ($pos = ($pos * 2) + 1) < $heap-end {
             my \left  = @!array[$pos];
             my \right = @!array[$pos + 1];
             if left precedes right {
-                @path.BIND-POS(++$path-end, left);
+                @!path.BIND-POS(++$path-end, left);
             }
             else {
                 $pos += 1;
-                @path.BIND-POS(++$path-end, right);
+                @!path.BIND-POS(++$path-end, right);
             }
         }
 
         # at the deepest level there may be only one child
         if $pos == $heap-end {
-            @path.BIND-POS(++$path-end, @!array[$pos]);
+            @!path.BIND-POS(++$path-end, @!array[$pos]);
         }
 
         # shorten the path until the final node can hold the value of the first
         my $value = $node;
-        while $path-end > 0 && $value precedes @path[$path-end] {
+        while $path-end > 0 && $value precedes @!path[$path-end] {
             $path-end--;
         }
 
         # shift values until we reach the final node of the path
         $pos = 0;
         while $pos < $path-end {
-            my \child = @path[++$pos];
+            my \child = @!path[++$pos];
             $node  = child;
             $node := child;
         }
