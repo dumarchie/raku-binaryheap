@@ -1,6 +1,6 @@
 use v6.c;
 use Test;
-plan 9;
+plan 10;
 
 use lib 'lib';
 use BinaryHeap;
@@ -117,6 +117,19 @@ subtest 'pop a value from a heap', {
           'heap no longer contains the original top';
     };
 };
+
+subtest 'consume values on a heap', {
+    my $heap = BinaryHeap.new(25, 17, 7, 2, 19, 36, 3, 1, 100);
+    my \got = $heap.consume;
+    isa-ok got, Seq, '.consume returns a Seq';
+    values-ok $heap, (1, 2, 3, 17, 19, 36, 7, 25, 100),
+      'the Seq does not modify the heap';
+
+    is-deeply got, (1, 2, 3, 7, 17, 19, 25, 36, 100).Seq,
+      'the Seq produces the heap values in order';
+
+    ok !$heap, 'the Seq extracts the values from the heap';
+}
 
 subtest 'push-pop', {
     is BinaryHeap.push-pop(Mu), Mu,

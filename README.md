@@ -95,6 +95,15 @@ Defined as:
 
 Returns a clone of the invocant. The clone is based on a distinct array, so modifications to one heap will not affect the other heap.
 
+method consume
+--------------
+
+Defined as:
+
+    method consume( --> Seq:D)
+
+Returns a `Seq` that generates values by removing them from the top of the heap. If no values are inserted into the heap before the `Seq` is exhausted, the values will be in ascending order if called on a *min-heap*, in descending order if called on a *max-heap*.
+
 method heapify
 --------------
 

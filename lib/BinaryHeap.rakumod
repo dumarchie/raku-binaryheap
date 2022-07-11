@@ -84,16 +84,19 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
         $node = $value;
     }
 
-    # Extract a value from a heap
+    # Extract a single value from a heap
     method pop() {
-        if self {
-            my $value = @!array[$!elems - 1]:delete;
-            --$!elems > 0 ?? self.replace($value) !! $value;
-        }
-        else {
-            Failure.new:
-              X::Cannot::Empty.new(:action<pop>, :what(self.^name));
-        }
+        self ?? self!extract !! Failure.new:
+          X::Cannot::Empty.new(:action<pop>, :what(self.^name));
+    }
+    method !extract() {
+        my $value = @!array[$!elems - 1]:delete;
+        --$!elems > 0 ?? self.replace($value) !! $value;
+    }
+
+    # Extract a Seq of values from a heap
+    method consume( --> Seq:D) {
+        gather take self!extract while self;
     }
 
     # Insert values into a heap
@@ -168,7 +171,7 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
     method values( --> Seq:D) {
         if self {
             my int $i;
-            gather while $i < $!elems { take @!array[$i++] }
+            gather take @!array[$i++] while $i < $!elems;
         }
         else {
             Empty.Seq;
@@ -315,6 +318,17 @@ Defined as:
 
 Returns a clone of the invocant. The clone is based on a distinct array, so
 modifications to one heap will not affect the other heap.
+
+=head2 method consume
+
+Defined as:
+
+    method consume( --> Seq:D)
+
+Returns a C<Seq> that generates values by removing them from the top of the
+heap. If no values are inserted into the heap before the C<Seq> is exhausted,
+the values will be in ascending order if called on a I<min-heap>, in descending
+order if called on a I<max-heap>.
 
 =head2 method heapify
 

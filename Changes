@@ -1,4 +1,6 @@
-0.0.6 2022-06-27
+0.0.7 2022-07-11
+    - Add .consume method
+0.0.6 2022-07-10
     - Improve behavior of the .sort method
     - Improve behavior and performance of the .push method
     - Improve behavior of the .pop method
