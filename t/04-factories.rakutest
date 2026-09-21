@@ -1,0 +1,45 @@
+use v6;
+use Test;
+plan 3;
+
+use BinaryHeap :max-heap, :min-heap;
+
+subtest 'imports', {
+    nok MY::<&heapsort>:exists, '&heapsort is not imported';
+
+    # Assert that imported subroutines are accessible via BinaryHeap::Utils
+    sub is-proto(&got, &expected, $desc = '') {
+        is-deeply (&got, |&got.candidates), (&expected, |&expected.candidates),
+          $desc;
+    }
+
+    is-proto &max-heap, &BinaryHeap::Utils::max-heap,
+      'imported &max-heap is short for &BinaryHeap::Utils::max-heap';
+
+    is-proto &min-heap, &BinaryHeap::Utils::min-heap,
+      'imported &min-heap is short for &BinaryHeap::Utils::min-heap';
+}
+
+my @values = 'foo' => 1, 'bar'=> 2, 'foobar' => 3, 'baz' => 4;
+
+subtest 'max-heap', {
+    cmp-ok max-heap(), 'eqv', BinaryHeap::MaxHeap.new, 'max-heap()';
+
+    cmp-ok max-heap(@values), 'eqv', BinaryHeap::MaxHeap.new(@values),
+      'max-heap(@values)';
+
+    my $heap = max-heap(*.value <=> *.value, @values);
+    cmp-ok $heap.consume, 'eqv', @values.sort({$^b.value <=> $^a.value}),
+      'max-heap(*.value <=> *.value, @values)';
+}
+
+subtest 'min-heap', {
+    cmp-ok min-heap(), 'eqv', BinaryHeap::MinHeap.new, 'min-heap()';
+
+    cmp-ok min-heap(@values), 'eqv', BinaryHeap::MinHeap.new(@values),
+      'min-heap(@values)';
+
+    my $heap = min-heap(*.value <=> *.value, @values);
+    cmp-ok $heap.consume, 'eqv', @values.sort({$^a.value <=> $^b.value}),
+      'min-heap(*.value <=> *.value, @values)';
+}

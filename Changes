@@ -1,3 +1,6 @@
+0.0.8 2026-09-21
+    - Add dynamic max-heap and min-heap factories
+    - Deprecate class parameterization
 0.0.7 2022-07-11
     - Add .consume method
 0.0.6 2022-07-10

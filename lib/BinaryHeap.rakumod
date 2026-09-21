@@ -177,10 +177,6 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
             Empty.Seq;
         }
     }
-
-    multi sub infix:<eqv>(BinaryHeap \a, BinaryHeap \b --> Bool:D) is export {
-        a.WHAT === b.WHAT && a.values eqv b.values;
-    }
 }
 
 class BinaryHeap::MaxHeap does BinaryHeap[* cmp * == More] is Parameterizable {
@@ -197,15 +193,37 @@ class BinaryHeap::MinHeap does BinaryHeap[* cmp * == Less] is Parameterizable {
     }
 }
 
-proto sub heapsort(|) is export {*}
-multi sub heapsort(@array, :$reverse) {
-    my \heap = $reverse ?? BinaryHeap::MinHeap !! BinaryHeap::MaxHeap;
-    heap.heapify(@array).sort;
+package BinaryHeap::Utils {
+    multi sub infix:<eqv>(BinaryHeap \a, BinaryHeap \b --> Bool:D)
+                          is export(:MANDATORY) {
+        a.WHAT === b.WHAT && a.values eqv b.values;
+    }
+
+    # Heapsort
+    our proto heapsort(|) is export(:DEFAULT, :heapsort) {*}
+    multi sub heapsort(@array, :$reverse) {
+        my \heap = $reverse ?? BinaryHeap::MinHeap !! BinaryHeap::MaxHeap;
+        heap.heapify(@array).sort;
+    }
+    multi sub heapsort(&cmp, @array, :$reverse) {
+        my \heap = $reverse ?? BinaryHeap::MinHeap !! BinaryHeap::MaxHeap;
+        heap.^parameterize(&cmp).heapify(@array).sort;
+    }
+
+    # Dynamic heap factories
+    our proto max-heap(| --> BinaryHeap:D) is export(:max-heap) {*}
+    multi sub max-heap(@values?) { BinaryHeap::MaxHeap.new(@values) }
+    multi sub max-heap(&infix:<cmp>, @values?) {
+        BinaryHeap[* cmp * == More].new(@values);
+    }
+
+    our proto min-heap(| --> BinaryHeap:D) is export(:min-heap) {*}
+    multi sub min-heap(@values?) { BinaryHeap::MinHeap.new(@values) }
+    multi sub min-heap(&infix:<cmp>, @values?) {
+        BinaryHeap[* cmp * == Less].new(@values);
+    }
 }
-multi sub heapsort(&cmp, @array, :$reverse) {
-    my \heap = $reverse ?? BinaryHeap::MinHeap !! BinaryHeap::MaxHeap;
-    heap.^parameterize(&cmp).heapify(@array).sort;
-}
+
 
 =begin pod
 
@@ -251,22 +269,40 @@ C<class BinaryHeap::MinHeap does BinaryHeap[* cmp * == Less]>
 In a I<min-heap>, a child node never compares C<Less> than its parent node.
 =end item
 
-These classes are parameterizable with a custom three-way comparison operator.
-For example, this I<max-heap> compares objects by their C<.key>:
+I<Deprecated:> these classes are parameterizable with a custom three-way
+comparison operator. For example, the following code constrains lexical variable
+C<$heap> to a I<max-heap> that compares objects by their C<.key>:
 
     my BinaryHeap::MaxHeap[*.key cmp *.key] $heap;
 
-An uninitialized C<BinaryHeap> is a valid representation of an empty heap. This
-means that all documented methods can be called on a type object. Methods that
-may add values to the heap try to autovivify an uninitialized invocant, which
-means they can only be called on a I<container> that stores or defaults to a
-I<class> type. For example, given the uninitialized C<$heap> declared above:
+This parameterization is deprecated because it relies on Rakudo-specific
+internals. There are two alternatives for defining a C<BinaryHeap> with a custom
+comparator. The first is to define a custom class, for example:
 
+    my class MaxHeap does BinaryHeap[*.key cmp *.key == More] {}
+
+A concise alternative is to use a dynamic object factory:
+
+    my $max-heap = max-heap(*.key cmp *.key);
+
+An uninitialized C<BinaryHeap> is a valid representation of an empty heap. This
+means that all public methods can be called on a type object. Methods that may
+add values to the heap autovivify an uninitialized invocant, which means they
+can only be called on a I<container> that stores or defaults to a I<class> type.
+For example:
+
+    my MaxHeap $heap;
     say $heap.values;      # OUTPUT: «()␤»
     say $heap.replace(42); # OUTPUT: «Nil␤»
     say $heap.top;         # OUTPUT: «42␤»
 
 =head1 EXPORTS
+
+    use BinaryHeap :heapsort, :max-heap, :min-heap
+
+Module C<BinaryHeap> exports useful subroutines from the C<BinaryHeap::Utils>
+package. Apart from the mandatory C<infix:<eqv>> export, they can be accessed
+by fully qualified name when importing the short name is inconvenient.
 
 =head2 infix eqv
 
@@ -275,16 +311,16 @@ Defined as:
     multi sub infix:<eqv>(BinaryHeap \a, BinaryHeap \b --> Bool:D)
 
 Returns C<True> if and only if the two heaps are of the same type and contain
-equivalent L<values|#method_values>. Note that a concrete heap is of a different
-type than a role, so:
-
-    say BinaryHeap.new eqv BinaryHeap;                   # OUTPUT: «False␤»
-    say BinaryHeap::MaxHeap.new eqv BinaryHeap::MaxHeap; # OUTPUT: «True␤»
+equivalent L<values|#method_values>. Note that a class is a different type than
+ a role, so C<BinaryHeap.new eqv BinaryHeap> returns C<False>, not because role
+ C<BinaryHeap> is undefined, but because C<BinaryHeap.new> returns an instance
+ of a I<class> with the same name as the role.
 
 =head2 sub heapsort
 
 Defined as:
 
+    proto sub heapsort(|) is export(:DEFAULT, :heapsort)
     multi sub heapsort(@array, :$reverse)
     multi sub heapsort(&comparator, @array, :$reverse)
 
@@ -298,6 +334,30 @@ put the elements of the array in descending order:
 
 Note that C<heapsort> is not a L<stable
 sort|https://en.wikipedia.org/wiki/Sorting_algorithm#Stability>.
+
+=head2 sub max-heap
+
+Defined as:
+
+    proto sub max-heap(| --> BinaryHeap:D) is export(:max-heap)
+    multi sub max-heap(@values?)
+    multi sub max-heap(&infix:<cmp>, @values?)
+
+Returns a standard C<BinaryHeap::MaxHeap> instance if called without a
+comparator. Otherwise returns a custom C<BinaryHeap[* cmp * == More]> instance.
+The provided values are stored on the heap.
+
+=head2 sub min-heap
+
+Defined as:
+
+    proto sub min-heap(| --> BinaryHeap:D) is export(:min-heap)
+    multi sub min-heap(@values?)
+    multi sub min-heap(&infix:<cmp>, @values?)
+
+Returns a standard C<BinaryHeap::MinHeap> instance if called without a
+comparator. Otherwise returns a custom C<BinaryHeap[* cmp * == Less]> instance.
+The provided values are stored on the heap.
 
 =head1 METHODS
 

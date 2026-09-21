@@ -34,18 +34,31 @@ Module `BinaryHeap` provides two classes that mix in the role:
 
     In a *min-heap*, a child node never compares `Less` than its parent node.
 
-These classes are parameterizable with a custom three-way comparison operator. For example, this *max-heap* compares objects by their `.key`:
+*Deprecated:* these classes are parameterizable with a custom three-way comparison operator. For example, the following code constrains lexical variable `$heap` to a *max-heap* that compares objects by their `.key`:
 
     my BinaryHeap::MaxHeap[*.key cmp *.key] $heap;
 
-An uninitialized `BinaryHeap` is a valid representation of an empty heap. This means that all documented methods can be called on a type object. Methods that may add values to the heap try to autovivify an uninitialized invocant, which means they can only be called on a *container* that stores or defaults to a *class* type. For example, given the uninitialized `$heap` declared above:
+This parameterization is deprecated because it relies on Rakudo-specific internals. There are two alternatives for defining a `BinaryHeap` with a custom comparator. The first is to define a custom class, for example:
 
+    my class MaxHeap does BinaryHeap[*.key cmp *.key == More] {}
+
+A concise alternative is to use a dynamic object factory:
+
+    my $max-heap = max-heap(*.key cmp *.key);
+
+An uninitialized `BinaryHeap` is a valid representation of an empty heap. This means that all public methods can be called on a type object. Methods that may add values to the heap autovivify an uninitialized invocant, which means they can only be called on a *container* that stores or defaults to a *class* type. For example:
+
+    my MaxHeap $heap;
     say $heap.values;      # OUTPUT: «()␤»
     say $heap.replace(42); # OUTPUT: «Nil␤»
     say $heap.top;         # OUTPUT: «42␤»
 
 EXPORTS
 =======
+
+    use BinaryHeap :heapsort, :max-heap, :min-heap
+
+Module `BinaryHeap` exports useful subroutines from the `BinaryHeap::Utils` package. Apart from the mandatory `infix:<eqv>` export, they can be accessed by fully qualified name when importing the short name is inconvenient.
 
 infix eqv
 ---------
@@ -54,16 +67,14 @@ Defined as:
 
     multi sub infix:<eqv>(BinaryHeap \a, BinaryHeap \b --> Bool:D)
 
-Returns `True` if and only if the two heaps are of the same type and contain equivalent [values](#method_values). Note that a concrete heap is of a different type than a role, so:
-
-    say BinaryHeap.new eqv BinaryHeap;                   # OUTPUT: «False␤»
-    say BinaryHeap::MaxHeap.new eqv BinaryHeap::MaxHeap; # OUTPUT: «True␤»
+Returns `True` if and only if the two heaps are of the same type and contain equivalent [values](#method_values). Note that a class is a different type than a role, so `BinaryHeap.new eqv BinaryHeap` returns `False`, not because role `BinaryHeap` is undefined, but because `BinaryHeap.new` returns an instance of a *class* with the same name as the role.
 
 sub heapsort
 ------------
 
 Defined as:
 
+    proto sub heapsort(|) is export(:DEFAULT, :heapsort)
     multi sub heapsort(@array, :$reverse)
     multi sub heapsort(&comparator, @array, :$reverse)
 
@@ -73,6 +84,28 @@ Sorts and returns the `@array`, using a custom three-way `&comparator` if provid
     heapsort -(* cmp *), @array;
 
 Note that `heapsort` is not a [stable sort](https://en.wikipedia.org/wiki/Sorting_algorithm#Stability).
+
+sub max-heap
+------------
+
+Defined as:
+
+    proto sub max-heap(| --> BinaryHeap:D) is export(:max-heap)
+    multi sub max-heap(@values?)
+    multi sub max-heap(&infix:<cmp>, @values?)
+
+Returns a standard `BinaryHeap::MaxHeap` instance if called without a comparator. Otherwise returns a custom `BinaryHeap[* cmp * == More]` instance. The provided values are stored on the heap.
+
+sub min-heap
+------------
+
+Defined as:
+
+    proto sub min-heap(| --> BinaryHeap:D) is export(:min-heap)
+    multi sub min-heap(@values?)
+    multi sub min-heap(&infix:<cmp>, @values?)
+
+Returns a standard `BinaryHeap::MinHeap` instance if called without a comparator. Otherwise returns a custom `BinaryHeap[* cmp * == Less]` instance. The provided values are stored on the heap.
 
 METHODS
 =======

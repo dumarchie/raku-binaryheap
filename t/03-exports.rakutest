@@ -1,17 +1,30 @@
 use v6.c;
 use Test;
-plan 5;
+plan 6;
 
-use lib 'lib';
-use BinaryHeap;
+# Assert that infix:<eqv> is a mandatory import
+use BinaryHeap :heapsort;
 
 subtest 'infix eqv', {
+    ok &infix:<eqv>.candidates.grep(
+        *.package === BinaryHeap::Utils
+    ), '&infix:<eqv> candidate is imported from package BinaryHeap::Utils';
+
     is BinaryHeap.new eqv BinaryHeap, False,
       'BinaryHeap.new eqv BinaryHeap';
 
     is BinaryHeap::MaxHeap.new eqv BinaryHeap::MaxHeap, True,
       'BinaryHeap::MaxHeap.new eqv BinaryHeap::MaxHeap';
 }
+
+# Assert that &heapsort is accssible via package BinaryHeap::Utils
+sub is-proto(&got, &expected, $desc = '') {
+    is-deeply (&got, |&got.candidates), (&expected, |&expected.candidates),
+      $desc;
+}
+
+is-proto &heapsort, &BinaryHeap::Utils::heapsort,
+  'imported &heapsort is short for &BinaryHeap::Utils::heapsort';
 
 my \values = 25, 17, 36, 2, 19, 7, 3, 1, 100;
 subtest 'heapsort', {
