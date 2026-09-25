@@ -1,4 +1,3 @@
-use lib 'lib';
 use BinaryHeap;
 
 my \n    = 2**16;
