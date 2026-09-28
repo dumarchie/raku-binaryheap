@@ -187,6 +187,15 @@ Defined as:
 
 Functionally equivalent, but more efficient than a [push](#method_push) followed by a [pop](#method_pop). [Replaces the top](#method_replace) of the heap if it `precedes` the provided value; otherwise just returns the provided value.
 
+method raku
+-----------
+
+Defined as:
+
+    multi method raku(BinaryHeap:D:)
+
+Returns a string representation of the heap that can be `EVAL`ed to reconstruct the heap, provided it belongs to a named class. Used to compare the structural equivalence of heaps when the exported `&infix:eqv` candidate is not in scope.
+
 method replace
 --------------
 

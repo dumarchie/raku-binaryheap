@@ -137,6 +137,12 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
         self && @!array[0] precedes value ?? self.replace(value) !! value;
     }
 
+    # Representation for core infix eqv
+    multi method raku(BinaryHeap:D:) {
+        my $cons = "{self.^name}.new";
+        $!elems ?? $cons ~ @!array[^$!elems].raku !! $cons;
+    }
+
     # Replace the top of a heap (extract, then insert)
     method replace(\SELF: Mu \new) {
         if self {
@@ -442,6 +448,16 @@ Functionally equivalent, but more efficient than a L<push|#method_push>
 followed by a L<pop|#method_pop>. L<Replaces the top|#method_replace> of the
 heap if it C<precedes> the provided value; otherwise just returns the provided
 value.
+
+=head2 method raku
+
+Defined as:
+
+    multi method raku(BinaryHeap:D:)
+
+Returns a string representation of the heap that can be C<EVAL>ed to reconstruct
+the heap, provided it belongs to a named class. Used to compare the structural
+equivalence of heaps when the exported C<&infix:eqv> candidate is not in scope.
 
 =head2 method replace
 
