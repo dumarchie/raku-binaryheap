@@ -173,6 +173,9 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
     method Bool( --> Bool:D) { self.defined && $!elems > 0 }
     method top() { self ?? @!array[0] !! Nil }
 
+    # Expose number of values on the heap
+    multi method elems(BinaryHeap:D:) { $!elems }
+
     # Allow introspection, but do not return containers:
     method values( --> Seq:D) {
         if self {
@@ -395,6 +398,14 @@ Returns a C<Seq> that generates values by removing them from the top of the
 heap. If no values are inserted into the heap before the C<Seq> is exhausted,
 the values will be in ascending order if called on a I<min-heap>, in descending
 order if called on a I<max-heap>.
+
+=head2 method elems
+
+Defined as:
+
+    multi method elems(BinaryHeap:D:)
+
+Returns the number of values on the heap. 
 
 =head2 method heapify
 

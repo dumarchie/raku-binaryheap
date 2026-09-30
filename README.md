@@ -137,6 +137,15 @@ Defined as:
 
 Returns a `Seq` that generates values by removing them from the top of the heap. If no values are inserted into the heap before the `Seq` is exhausted, the values will be in ascending order if called on a *min-heap*, in descending order if called on a *max-heap*.
 
+method elems
+------------
+
+Defined as:
+
+    multi method elems(BinaryHeap:D:)
+
+Returns the number of values on the heap. 
+
 method heapify
 --------------
 
