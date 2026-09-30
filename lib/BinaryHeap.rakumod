@@ -170,7 +170,7 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
         @array;
     }
 
-    method Bool( --> Bool:D) { self.defined && $!elems > 0 }
+    multi method Bool(BinaryHeap:D: --> Bool:D) { $!elems > 0 }
     method top() { self ?? @!array[0] !! Nil }
 
     # Expose number of values on the heap
@@ -374,9 +374,9 @@ The provided values are stored on the heap.
 
 Defined as:
 
-    method Bool( --> Bool:D)
+    multi method Bool(BinaryHeap:D: --> Bool:D)
 
-Returns C<True> if the heap contains at least one node, and C<False> if the
+Returns C<True> if the heap contains at least one value, and C<False> if the
 heap is empty.
 
 =head2 method clone

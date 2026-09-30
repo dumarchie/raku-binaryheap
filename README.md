@@ -115,9 +115,9 @@ method Bool
 
 Defined as:
 
-    method Bool( --> Bool:D)
+    multi method Bool(BinaryHeap:D: --> Bool:D)
 
-Returns `True` if the heap contains at least one node, and `False` if the heap is empty.
+Returns `True` if the heap contains at least one value, and `False` if the heap is empty.
 
 method clone
 ------------
