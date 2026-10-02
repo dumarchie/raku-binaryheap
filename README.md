@@ -115,7 +115,7 @@ method Bool
 
 Defined as:
 
-    multi method Bool(BinaryHeap:D: --> Bool:D)
+    multi method Bool(::?CLASS:D: --> Bool:D)
 
 Returns `True` if the heap contains at least one value, and `False` if the heap is empty.
 
@@ -124,7 +124,7 @@ method clone
 
 Defined as:
 
-    multi method clone(BinaryHeap:D: --> BinaryHeap:D)
+    multi method clone(::?CLASS:D: --> BinaryHeap:D)
 
 Returns a clone of the invocant. The clone is based on a distinct array, so modifications to one heap will not affect the other heap.
 
@@ -142,7 +142,7 @@ method elems
 
 Defined as:
 
-    multi method elems(BinaryHeap:D:)
+    multi method elems(::?CLASS:D:)
 
 Returns the number of values on the heap. 
 
@@ -201,7 +201,7 @@ method raku
 
 Defined as:
 
-    multi method raku(BinaryHeap:D:)
+    multi method raku(::?CLASS:D:)
 
 Returns a string representation of the heap that can be `EVAL`ed to reconstruct the heap, provided it belongs to a named class. Used to compare the structural equivalence of heaps when the exported `&infix:eqv` candidate is not in scope.
 
@@ -260,7 +260,7 @@ Source can be located at: https://github.com/dumarchie/raku-binaryheap
 COPYRIGHT AND LICENSE
 =====================
 
-Copyright 2022 Peter du Marchie van Voorthuysen
+Copyright 2022-2026 Peter du Marchie van Voorthuysen
 
 This library is free software; you can redistribute it and/or modify it under the Artistic License 2.0.
 

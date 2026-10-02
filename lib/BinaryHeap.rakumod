@@ -18,7 +18,7 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
     }
 
     # Clone a concrete heap
-    multi method clone(BinaryHeap:D: --> BinaryHeap:D) {
+    multi method clone(::?CLASS:D: --> BinaryHeap:D) {
         my @copy = @!array.head($!elems);
         self.CREATE!SET-SELF(@copy);
     }
@@ -104,15 +104,15 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
     multi method push(::?CLASS:U $_ is rw: **@values is raw --> BinaryHeap:D) {
         $_ = self.CREATE.push(|@values);
     }
-    multi method push(BinaryHeap:D: **@values is raw --> BinaryHeap:D) {
+    multi method push(::?CLASS:D: **@values is raw --> BinaryHeap:D) {
         self!insert($_) for @values;
         self;
     }
-    multi method push(BinaryHeap:D: Slip \values --> BinaryHeap:D) {
+    multi method push(::?CLASS:D: Slip \values --> BinaryHeap:D) {
         self!insert($_) for values;
         self;
     }
-    multi method push(BinaryHeap:D: Mu \value --> BinaryHeap:D) {
+    multi method push(::?CLASS:D: Mu \value --> BinaryHeap:D) {
         self!insert(value);
         self;
     }
@@ -138,7 +138,7 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
     }
 
     # Representation for core infix eqv
-    multi method raku(BinaryHeap:D:) {
+    multi method raku(::?CLASS:D:) {
         my $cons = "{self.^name}.new";
         $!elems ?? $cons ~ @!array[^$!elems].raku !! $cons;
     }
@@ -159,8 +159,8 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
     }
 
     proto method sort(|) {*}
-    multi method sort(BinaryHeap:U:) { Array.new }
-    multi method sort(BinaryHeap:D:) {
+    multi method sort(::?CLASS:U:) { Array.new }
+    multi method sort(::?CLASS:D:) {
         my @array := @!array;
         while $!elems > 1 {
             my $node := @array[--$!elems];
@@ -170,11 +170,11 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
         @array;
     }
 
-    multi method Bool(BinaryHeap:D: --> Bool:D) { $!elems > 0 }
+    multi method Bool(::?CLASS:D: --> Bool:D) { $!elems > 0 }
     method top() { self ?? @!array[0] !! Nil }
 
     # Expose number of values on the heap
-    multi method elems(BinaryHeap:D:) { $!elems }
+    multi method elems(::?CLASS:D:) { $!elems }
 
     # Allow introspection, but do not return containers:
     method values( --> Seq:D) {
@@ -374,7 +374,7 @@ The provided values are stored on the heap.
 
 Defined as:
 
-    multi method Bool(BinaryHeap:D: --> Bool:D)
+    multi method Bool(::?CLASS:D: --> Bool:D)
 
 Returns C<True> if the heap contains at least one value, and C<False> if the
 heap is empty.
@@ -383,7 +383,7 @@ heap is empty.
 
 Defined as:
 
-    multi method clone(BinaryHeap:D: --> BinaryHeap:D)
+    multi method clone(::?CLASS:D: --> BinaryHeap:D)
 
 Returns a clone of the invocant. The clone is based on a distinct array, so
 modifications to one heap will not affect the other heap.
@@ -403,7 +403,7 @@ order if called on a I<max-heap>.
 
 Defined as:
 
-    multi method elems(BinaryHeap:D:)
+    multi method elems(::?CLASS:D:)
 
 Returns the number of values on the heap. 
 
@@ -464,7 +464,7 @@ value.
 
 Defined as:
 
-    multi method raku(BinaryHeap:D:)
+    multi method raku(::?CLASS:D:)
 
 Returns a string representation of the heap that can be C<EVAL>ed to reconstruct
 the heap, provided it belongs to a named class. Used to compare the structural
@@ -525,7 +525,7 @@ Source can be located at: https://github.com/dumarchie/raku-binaryheap
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2022 Peter du Marchie van Voorthuysen
+Copyright 2022-2026 Peter du Marchie van Voorthuysen
 
 This library is free software; you can redistribute it and/or modify it under
 the Artistic License 2.0.
