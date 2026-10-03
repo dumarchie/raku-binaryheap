@@ -146,6 +146,15 @@ Defined as:
 
 Returns the number of values on the heap. 
 
+method gist
+-----------
+
+Defined as:
+
+    multi method gist(::?CLASS:D:)
+
+Returns the gist of the values on the heap.
+
 method heapify
 --------------
 

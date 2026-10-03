@@ -1,14 +1,16 @@
 use Test;
-plan 3;
+plan 6;
 
 use BinaryHeap :min-heap;
 
+is min-heap.gist, Empty.gist, 'min-heap.gist';
 is min-heap.raku, 'BinaryHeap::MinHeap.new', 'min-heap.raku';
 
 # Assert that values provided in heap order maintain their position
 for (1, 2, 3), (1, 3, 2) -> \values {
     my $raku = "BinaryHeap::MinHeap.new{values.raku}";
     my $heap = EVAL $raku;
+    is $heap.gist, values.gist, "$raku.gist";
     is $heap.raku, $raku, "$raku.raku";
 }
 

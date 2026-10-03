@@ -137,12 +137,6 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
         self && @!array[0] precedes value ?? self.replace(value) !! value;
     }
 
-    # Representation for core infix eqv
-    multi method raku(::?CLASS:D:) {
-        my $cons = "{self.^name}.new";
-        $!elems ?? $cons ~ @!array[^$!elems].raku !! $cons;
-    }
-
     # Replace the top of a heap (extract, then insert)
     method replace(\SELF: Mu \new) {
         if self {
@@ -182,6 +176,16 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
     multi method values(::?CLASS:D:) {
         # In Rakudo, .values on a native array slice returns a List
         @!array[^$!elems].Seq;
+    }
+
+    multi method gist(::?CLASS:D:) {
+        self.values.gist;
+    }
+
+    # Representation for core infix eqv
+    multi method raku(::?CLASS:D:) {
+        my $cons = "{self.^name}.new";
+        $!elems ?? $cons ~ @!array[^$!elems].raku !! $cons;
     }
 }
 
@@ -403,6 +407,14 @@ Defined as:
     multi method elems(::?CLASS:D:)
 
 Returns the number of values on the heap. 
+
+=head2 method gist
+
+Defined as:
+
+    multi method gist(::?CLASS:D:)
+
+Returns the gist of the values on the heap.
 
 =head2 method heapify
 
