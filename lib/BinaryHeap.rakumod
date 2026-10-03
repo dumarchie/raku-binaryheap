@@ -177,14 +177,11 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
     multi method elems(::?CLASS:D:) { $!elems }
 
     # Allow introspection, but do not return containers:
-    method values( --> Seq:D) {
-        if self {
-            my int $i;
-            gather take @!array[$i++] while $i < $!elems;
-        }
-        else {
-            Empty.Seq;
-        }
+    proto method values( --> Seq:D) {*}
+    multi method values(::?CLASS:U:) { Empty.Seq }
+    multi method values(::?CLASS:D:) {
+        # In Rakudo, .values on a native array slice returns a List
+        @!array[^$!elems].Seq;
     }
 }
 
