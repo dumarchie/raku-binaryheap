@@ -173,6 +173,15 @@ Defined as:
 
 Constructs a new heap storing the provided values.
 
+method of
+---------
+
+Defined as:
+
+    method of()
+
+Returns the type constraint for the values on the heap. Returns `Mu` by default, but a heap can be constrained to a specific type by calling `.heapify(@array)` with a type-constrained `@array`.
+
 method pop
 ----------
 

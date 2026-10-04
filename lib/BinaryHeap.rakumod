@@ -17,10 +17,14 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
         self;
     }
 
-    # Clone a concrete heap
+    # A clone should retain a constraint on element type
     multi method clone(::?CLASS:D:) {
         self.CREATE!SET-SELF(@!array.clone, $!elems);
     }
+
+    proto method of() {*}
+    multi method of(::?CLASS:U:) { Mu }
+    multi method of(::?CLASS:D:) { @!array.of }
 
     # Construct a heap with zero or more values
     proto method new(|) {*}
@@ -431,6 +435,16 @@ Defined as:
     method new(+values --> BinaryHeap:D)
 
 Constructs a new heap storing the provided values.
+
+=head2 method of
+
+Defined as:
+
+    method of()
+
+Returns the type constraint for the values on the heap. Returns C<Mu> by
+default, but a heap can be constrained to a specific type by calling
+C<.heapify(@array)> with a type-constrained C<@array>.
 
 =head2 method pop
 

@@ -13,6 +13,7 @@ sub heap-ok(\heap, \values, $desc?) {
 
 subtest 'uninitialized heap', {
     is BinaryHeap.Bool, False, '.Bool';
+    is BinaryHeap.of, Mu, '.of';
     is BinaryHeap.top, Nil, '.top';
     heap-ok BinaryHeap, Empty;
     is-deeply BinaryHeap.sort, [], '.sort returns an empty Array';
@@ -168,6 +169,8 @@ subtest 'clone', {
 subtest 'heapify', {
     my int @array[9] = 25, 17, 36, 2, 19, 7, 3, 1, 100;
     my $heap = BinaryHeap.heapify(@array);
+    is $heap.of, int,
+      '.heapify(@array) constrains the type of values on the heap';
 
     my int @heapified[9] = 1, 2, 3, 17, 19, 7, 36, 25, 100;
     is-deeply @array, @heapified,
@@ -185,6 +188,15 @@ subtest 'heapify', {
         dies-ok { $heap.push(0) }, '.push(value) dies';
         heap-ok $heap, @heapified, 'the heap is not modified';
     };
+
+    # .replace does not change the size of the underlying array
+    subtest 'replace top with value of invalid type', {
+        dies-ok { $heap.replace('foo') }, '.replace(value) dies';
+        heap-ok $heap, @heapified, 'the heap is not modified';
+    };
+
+    my $heap2 = $heap.clone;
+    is $heap2.of, int, '.clone maintains the type constraint of the heap';
 }
 
 subtest 'sort the values on a heap', {
