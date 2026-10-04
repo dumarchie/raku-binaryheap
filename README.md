@@ -124,9 +124,9 @@ method clone
 
 Defined as:
 
-    multi method clone(::?CLASS:D: --> BinaryHeap:D)
+    multi method clone(::?CLASS:D:)
 
-Returns a clone of the invocant. The clone is based on a distinct array, so modifications to one heap will not affect the other heap.
+Returns a clone of the heap.
 
 method consume
 --------------

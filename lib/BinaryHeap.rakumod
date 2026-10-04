@@ -11,16 +11,15 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
     has @!array;
     has int $!elems;
     has @!path; # reusable path for sift-down
-    method !SET-SELF(@array) {
+    method !SET-SELF(@array, $elems = @array.elems) {
         @!array := @array;
-        $!elems = @!array.elems;
+        $!elems = $elems;
         self;
     }
 
     # Clone a concrete heap
-    multi method clone(::?CLASS:D: --> BinaryHeap:D) {
-        my @copy = @!array.head($!elems);
-        self.CREATE!SET-SELF(@copy);
+    multi method clone(::?CLASS:D:) {
+        self.CREATE!SET-SELF(@!array.clone, $!elems);
     }
 
     # Construct a heap with zero or more values
@@ -384,10 +383,9 @@ heap is empty.
 
 Defined as:
 
-    multi method clone(::?CLASS:D: --> BinaryHeap:D)
+    multi method clone(::?CLASS:D:)
 
-Returns a clone of the invocant. The clone is based on a distinct array, so
-modifications to one heap will not affect the other heap.
+Returns a clone of the heap.
 
 =head2 method consume
 
