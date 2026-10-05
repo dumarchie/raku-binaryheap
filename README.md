@@ -153,25 +153,25 @@ Defined as:
 
     multi method gist(::?CLASS:D:)
 
-Returns the gist of the values on the heap.
+Returns the gist of the array underlying the heap.
 
 method heapify
 --------------
 
 Defined as:
 
-    method heapify(@array --> BinaryHeap:D)
+    method heapify(@array --> ::?CLASS:D)
 
-Constructs a new heap based on the provided array, whose elements are put in heap order. The `@array` should not be modified directly while the heap is in use.
+Constructs a new heap based on the provided array, whose elements are put in heap order. This method is *deprecated* because it breaks encapsulation.
 
 method new
 ----------
 
-Defined as:
+Conceptually defined as:
 
-    method new(+values --> BinaryHeap:D)
+    method new(+values --> ::?CLASS:D)
 
-Constructs a new heap storing the provided values.
+Constructs a new heap storing the provided values. If values are provided as a single, non-itemized array, the type constraint of the array applies to all values on the heap.
 
 method of
 ---------
@@ -180,7 +180,7 @@ Defined as:
 
     method of()
 
-Returns the type constraint for the values on the heap. Returns `Mu` by default, but a heap can be constrained to a specific type by calling `.heapify(@array)` with a type-constrained `@array`.
+Returns the type constraint for the values on the heap. Returns `Mu` by default, but a heap can be constrained to a specific element type by calling `.new` with a type-constrained array.
 
 method pop
 ----------

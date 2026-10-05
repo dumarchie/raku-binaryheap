@@ -8,7 +8,7 @@ sub heap-ok(\heap, \values, $desc?) {
         my \expected = heap.defined ?? values.elems !! 1;
         is heap.elems, expected, '.elems';
     }
-    is-deeply heap.values, values.Seq, $desc // '.values';
+    cmp-ok heap.values, 'eqv', values.Seq, $desc // '.values';
 }
 
 subtest 'uninitialized heap', {
@@ -36,18 +36,18 @@ subtest 'create a heap', {
         heap-ok $heap, (Mu,);
     }
 
+    my \values = (25, 17, 36, 2, 19, 7, 3, 1, 100);
     subtest 'create a heap from a list of values', {
-        my \values = (25, 17, 36, 2, 19, 7, 3, 1, 100);
         my $heap = BinaryHeap.new(values);
         does-ok $heap, BinaryHeap, 'BinaryHeap.new(values)';
         heap-ok $heap, (1, 2, 3, 17, 19, 7, 36, 25, 100);
     }
 
     subtest 'create a heap from an itemized Slip', {
-        my $slip = slip(25, 17, 36, 2, 19, 7, 3, 1, 100);
+        my $slip = values.Slip;
         my $heap = BinaryHeap.new($slip);
         does-ok $heap, BinaryHeap, 'BinaryHeap.new($slip)';
-        heap-ok $heap, (1, 2, 3, 17, 19, 7, 36, 25, 100);
+        heap-ok $heap, [$slip];
     }
 };
 

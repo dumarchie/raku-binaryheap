@@ -14,30 +14,10 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
     method !SET-SELF(@array, $elems = @array.elems) {
         @!array := @array;
         $!elems = $elems;
-        self;
-    }
-
-    # A clone should retain a constraint on element type
-    multi method clone(::?CLASS:D:) {
-        self.CREATE!SET-SELF(@!array.clone, $!elems);
-    }
-
-    proto method of() {*}
-    multi method of(::?CLASS:U:) { Mu }
-    multi method of(::?CLASS:D:) { @!array.of }
-
-    # Construct a heap with zero or more values
-    proto method new(|) {*}
-    multi method new(        --> BinaryHeap:D) { self.CREATE }
-    multi method new(+values --> BinaryHeap:D) { self.heapify(values.Array) }
-
-    # Heapify an array
-    method heapify(@array --> BinaryHeap:D) {
-        self.CREATE!SET-SELF(@array)!HEAPIFY;
-    }
-    method !HEAPIFY() {
-        my int $pos = ($!elems - 2) div 2; # last internal node
-        self!sift-down($pos--) while $pos >= 0;
+        if $!elems > 1 { # heapify array
+            my int $pos = ($!elems - 2) div 2; # last internal node
+            self!sift-down($pos--) while $pos >= 0;
+        }
         self;
     }
 
@@ -85,6 +65,37 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
 
         # assign the original value of the first node to the final node
         $node = $value;
+    }
+
+    # Construct a heap with zero or more values
+    proto method new(| --> ::?CLASS:D) {*}
+    multi method new() { self.CREATE }
+    multi method new(**@values) { self.heapify(@values) }
+    multi method new(Iterable \value) {
+        if value !=:= value<> {
+            self.CREATE!SET-SELF([value]);
+        }
+        elsif value ~~ Array|array {
+            self.CREATE!SET-SELF(value.clone);
+        }
+        else {
+            self.CREATE!SET-SELF(value.Array);
+        }
+    }
+
+    # DEPRECATED: Heapify an array without cloning
+    method heapify(@array --> ::?CLASS:D) {
+        self.CREATE!SET-SELF(@array);
+    }
+
+    # A heap has the type constraint of the underlying array
+    proto method of() {*}
+    multi method of(::?CLASS:U:) { Mu }
+    multi method of(::?CLASS:D:) { @!array.of }
+
+    # A clone should retain a constraint on element type
+    multi method clone(::?CLASS:D:) {
+        self.CREATE!SET-SELF(@!array.clone, $!elems);
     }
 
     # Extract a single value from a heap
@@ -416,25 +427,26 @@ Defined as:
 
     multi method gist(::?CLASS:D:)
 
-Returns the gist of the values on the heap.
+Returns the gist of the array underlying the heap.
 
 =head2 method heapify
 
 Defined as:
 
-    method heapify(@array --> BinaryHeap:D)
+    method heapify(@array --> ::?CLASS:D)
 
 Constructs a new heap based on the provided array, whose elements are put in
-heap order. The C<@array> should not be modified directly while the heap is in
-use.
+heap order. This method is *deprecated* because it breaks encapsulation.
 
 =head2 method new
 
-Defined as:
+Conceptually defined as:
 
-    method new(+values --> BinaryHeap:D)
+    method new(+values --> ::?CLASS:D)
 
-Constructs a new heap storing the provided values.
+Constructs a new heap storing the provided values. If values are provided as a 
+single, non-itemized array, the type constraint of the array applies to all
+values on the heap.
 
 =head2 method of
 
@@ -443,8 +455,8 @@ Defined as:
     method of()
 
 Returns the type constraint for the values on the heap. Returns C<Mu> by
-default, but a heap can be constrained to a specific type by calling
-C<.heapify(@array)> with a type-constrained C<@array>.
+default, but a heap can be constrained to a specific element type by calling
+C<.new> with a type-constrained array.
 
 =head2 method pop
 
