@@ -1,11 +1,13 @@
 use BinaryHeap;
 
-my \n       = 2**19;
-my @values  = (^n).roll(n);
-my \reified = @values.elems;
+my \n = 2**19;
+srand(42); # make roll reproducible
+
+my @values = (^n).roll(n);
+say "Last value: {@values.tail}"; # reifies
 
 my $time = now;
 my $heap = BinaryHeap.new(@values);
 $time = now - $time;
 
-printf "Create heap from array with {reified} elems: %0.2fms\n", $time * 1000;
+printf "Create heap from array with %d values: %0.2fms\n", n, $time * 1000;
