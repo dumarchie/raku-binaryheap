@@ -72,7 +72,7 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
     multi method new() { self.CREATE }
     multi method new(**@values) { self.heapify(@values) }
     multi method new(Iterable \value) {
-        if value !=:= value<> {
+        if value.VAR !=== value {
             self.CREATE!SET-SELF([value]);
         }
         elsif value ~~ Array|array {
@@ -435,8 +435,9 @@ Defined as:
 
     method heapify(@array --> ::?CLASS:D)
 
-Constructs a new heap based on the provided array, whose elements are put in
-heap order. This method is *deprecated* because it breaks encapsulation.
+Constructs a new heap based on the I<provided> array, whose elements are put in
+heap order. This method is I<deprecated> because it breaks encapsulation; use
+C<.new(@array)> to create a heap with a type constraint on elements.
 
 =head2 method new
 

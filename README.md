@@ -162,7 +162,7 @@ Defined as:
 
     method heapify(@array --> ::?CLASS:D)
 
-Constructs a new heap based on the provided array, whose elements are put in heap order. This method is *deprecated* because it breaks encapsulation.
+Constructs a new heap based on the *provided* array, whose elements are put in heap order. This method is *deprecated* because it breaks encapsulation; use `.new(@array)` to create a heap with a type constraint on elements.
 
 method new
 ----------
