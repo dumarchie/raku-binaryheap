@@ -1,3 +1,7 @@
+0.0.9 2026-10-07
+    - Support type constraint on underlying array
+    - Add methods .elems, .gist, .of and .raku
+    - Deprecate method .heapify
 0.0.8 2026-09-21
     - Add dynamic max-heap and min-heap factories
     - Deprecate class parameterization
