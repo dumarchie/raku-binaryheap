@@ -70,7 +70,9 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
     # Construct a heap with zero or more values
     proto method new(| --> ::?CLASS:D) {*}
     multi method new() { self.CREATE }
-    multi method new(**@values) { self.heapify(@values) }
+    multi method new(**@values) {
+        self.CREATE!SET-SELF(@values);
+    }
     multi method new(Iterable \value) {
         if value.VAR !=== value {
             self.CREATE!SET-SELF([value]);
