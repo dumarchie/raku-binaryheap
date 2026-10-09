@@ -1,7 +1,7 @@
 use Test;
 plan 10;
 
-use BinaryHeap;
+use BinaryHeap <GenHeap>;
 
 sub heap-ok(\heap, \values, $desc?) {
     unless $desc {
@@ -12,25 +12,25 @@ sub heap-ok(\heap, \values, $desc?) {
 }
 
 subtest 'uninitialized heap', {
-    is BinaryHeap.Bool, False, '.Bool';
-    is BinaryHeap.of, Mu, '.of';
-    is BinaryHeap.top, Nil, '.top';
-    heap-ok BinaryHeap, Empty;
-    is-deeply BinaryHeap.sort, [], '.sort returns an empty Array';
+    is GenHeap.Bool, False, '.Bool';
+    is GenHeap.of, Mu, '.of';
+    is GenHeap.top, Nil, '.top';
+    heap-ok GenHeap, Empty;
+    is-deeply GenHeap.sort, [], '.sort returns an empty Array';
 }
 
 subtest 'create a heap', {
     subtest 'create an empty heap', {
-        my $heap = BinaryHeap.new;
-        does-ok $heap, BinaryHeap, 'BinaryHeap.new';
+        my $heap = GenHeap.new;
+        does-ok $heap, GenHeap, 'GenHeap.new';
         is $heap.Bool, False, '.Bool';
         is $heap.top, Nil, '.top';
         heap-ok $heap, Empty;
     }
 
     subtest 'create a heap from a single value', {
-        my $heap = BinaryHeap.new(Mu);
-        does-ok $heap, BinaryHeap, 'BinaryHeap.new(Mu)';
+        my $heap = GenHeap.new(Mu);
+        does-ok $heap, GenHeap, 'GenHeap.new(Mu)';
         is $heap.Bool, True, '.Bool';
         is $heap.top, Mu, '.top';
         heap-ok $heap, (Mu,);
@@ -38,28 +38,28 @@ subtest 'create a heap', {
 
     my \values = (25, 17, 36, 2, 19, 7, 3, 1, 100);
     subtest 'create a heap from a list of values', {
-        my $heap = BinaryHeap.new(values);
-        does-ok $heap, BinaryHeap, 'BinaryHeap.new(values)';
+        my $heap = GenHeap.new(values);
+        does-ok $heap, GenHeap, 'GenHeap.new(values)';
         heap-ok $heap, (1, 2, 3, 17, 19, 7, 36, 25, 100);
     }
 
     subtest 'create a heap from an itemized Slip', {
-        my $slip = values.Slip;
-        my $heap = BinaryHeap.new($slip);
-        does-ok $heap, BinaryHeap, 'BinaryHeap.new($slip)';
+        my $slip = slip(25, 17, 36, 2, 19, 7, 3, 1, 100);
+        my $heap = GenHeap.new($slip);
+        does-ok $heap, GenHeap, 'GenHeap.new($slip)';
         heap-ok $heap, [$slip];
     }
 };
 
 subtest 'push onto a heap', {
     subtest 'push a single value onto an empty heap', {
-        my $heap  = BinaryHeap.new;
+        my $heap  = GenHeap.new;
         cmp-ok $heap.push(Mu), '===', $heap, '.push(Mu) returns the heap';
         heap-ok $heap, (Mu,), 'heap includes the provided value';
     }
 
     subtest 'push multiple values onto a heap', {
-        my $heap = BinaryHeap.new(25, 17, 36);
+        my $heap = GenHeap.new(25, 17, 36);
         cmp-ok $heap.push(2, 19, 7, 3, 1, 100), '===', $heap,
           '.push(2, 19, 7, 3, 1, 100) returns the heap';
 
@@ -68,7 +68,7 @@ subtest 'push onto a heap', {
     }
 
     subtest 'push a Slip onto a heap', {
-        my $heap = BinaryHeap.new(25, 17, 36);
+        my $heap = GenHeap.new(25, 17, 36);
         my $slip = slip(2, 19, 7, 3, 1, 100);
         cmp-ok $heap.push($slip), '===', $heap, '.push($slip) returns the heap';
         heap-ok $heap, (1, 2, 3, 17, 19, 36, 7, 25, 100),
@@ -78,20 +78,20 @@ subtest 'push onto a heap', {
 
 subtest 'replace the top of a heap', {
     subtest 'replace into an empty heap', {
-        my $heap = BinaryHeap.new;
+        my $heap = GenHeap.new;
         is $heap.replace(Mu), Nil, '.replace(value) returns Nil';
         heap-ok $heap, (Mu,), 'heap contains the provided value';
     };
 
     subtest 'replace the top of a non-empty heap with a Slip', {
-        my $heap = BinaryHeap.new(Mu);
+        my $heap = GenHeap.new(Mu);
         my $slip = slip(1, 2);
         is $heap.replace($slip), Mu, '.replace($slip) returns the original top';
         is-deeply $heap.top, $slip, 'new top is the provided Slip';
     };
 
     subtest 'sift down a lower-precedence value', {
-        my $heap = BinaryHeap.new(1, 2, 3, 5, 4, 7, 6, 10, 9, 8);
+        my $heap = GenHeap.new(1, 2, 3, 5, 4, 7, 6, 10, 9, 8);
         is $heap.replace(11), 1, '.replace(value) returns the original top';
         heap-ok $heap, (2, 4, 3, 5, 8, 7, 6, 10, 9, 11),
           'heap contains the provided value instead';
@@ -99,22 +99,22 @@ subtest 'replace the top of a heap', {
 };
 
 subtest 'pop a value from a heap', {
-    fails-like { BinaryHeap.pop },
-      X::Cannot::Empty, :action<pop>, :what<BinaryHeap>,
+    fails-like { GenHeap.pop },
+      X::Cannot::Empty, :action<pop>, :what(GenHeap.^name),
       'pop from an uninitialized heap';
 
-    fails-like { BinaryHeap.new.pop },
-      X::Cannot::Empty, :action<pop>, :what<BinaryHeap>,
+    fails-like { GenHeap.new.pop },
+      X::Cannot::Empty, :action<pop>, :what(GenHeap.^name),
       'pop from an empty heap';
 
     subtest 'pop from a heap containing a single value', {
-        my $heap = BinaryHeap.new(Mu);
+        my $heap = GenHeap.new(Mu);
         is $heap.pop, Mu, '.pop returns the top';
         heap-ok $heap, Empty, 'heap is empty';
     };
 
     subtest 'pop from a heap containing multiple values', {
-        my $heap = BinaryHeap.new(25, 17, 7, 2, 19, 36, 3, 1, 100);
+        my $heap = GenHeap.new(25, 17, 7, 2, 19, 36, 3, 1, 100);
         is $heap.pop, 1, '.pop returns the original top';
         heap-ok $heap, (2, 17, 3, 25, 19, 36, 7, 100),
           'heap no longer contains the original top';
@@ -122,7 +122,7 @@ subtest 'pop a value from a heap', {
 };
 
 subtest 'consume values on a heap', {
-    my $heap = BinaryHeap.new(25, 17, 7, 2, 19, 36, 3, 1, 100);
+    my $heap = GenHeap.new(25, 17, 7, 2, 19, 36, 3, 1, 100);
     my \got = $heap.consume;
     isa-ok got, Seq, '.consume returns a Seq';
     heap-ok $heap, (1, 2, 3, 17, 19, 36, 7, 25, 100),
@@ -135,30 +135,30 @@ subtest 'consume values on a heap', {
 }
 
 subtest 'push-pop', {
-    is BinaryHeap.push-pop(Mu), Mu,
-      'BinaryHeap.push-pop(Mu) returns the provided value';
+    is GenHeap.push-pop(Mu), Mu,
+      'GenHeap.push-pop(Mu) returns the provided value';
 
     subtest 'push-pop when heap instance is empty', {
-        my $heap = BinaryHeap.new;
+        my $heap = GenHeap.new;
         is $heap.push-pop(Mu), Mu, '.push-pop(Mu) returns the provided value';
         heap-ok $heap, Empty, 'heap remains empty';
     };
 
     subtest 'push-pop when provided value precedes top', {
-        my $heap = BinaryHeap.new(1, 2);
+        my $heap = GenHeap.new(1, 2);
         is $heap.push-pop(0), 0, '.push-pop(value) returns the provided value';
         heap-ok $heap, (1, 2), 'heap remains the same';
     };
 
     subtest 'push-pop when top precedes provided value', {
-        my $heap = BinaryHeap.new(1, 2);
+        my $heap = GenHeap.new(1, 2);
         is $heap.push-pop(42), 1, '.push-pop(value) returns the old top';
         heap-ok $heap, (2, 42), 'heap contains the provided value instead';
     };
 };
 
 subtest 'clone', {
-    my $heap  = BinaryHeap.new(1, 2);
+    my $heap  = GenHeap.new(1, 2);
     my $heap2 = $heap.clone;
     heap-ok $heap2, (1, 2), '.clone returns a heap storing the same values';
 
@@ -168,7 +168,7 @@ subtest 'clone', {
 
 subtest 'heapify', {
     my int @array[9] = 25, 17, 36, 2, 19, 7, 3, 1, 100;
-    my $heap = BinaryHeap.heapify(@array);
+    my $heap = GenHeap.heapify(@array);
     is $heap.of, int,
       '.heapify(@array) constrains the type of values on the heap';
 
@@ -176,7 +176,7 @@ subtest 'heapify', {
     is-deeply @array, @heapified,
       '.heapify(@array) puts the elements of @array in heap order';
 
-    does-ok $heap, BinaryHeap, 'the return value is a heap';
+    does-ok $heap, GenHeap, 'the return value is a heap';
     heap-ok $heap, @heapified, 'the heap is based on the @array';
 
     subtest 'pop when array does not support it', {
@@ -201,7 +201,7 @@ subtest 'heapify', {
 
 subtest 'sort the values on a heap', {
     my int @array = 25, 17, 36, 2, 19, 7, 3, 1, 100;
-    my $heap = BinaryHeap.heapify(@array);
+    my $heap = GenHeap.heapify(@array);
 
     my \got = $heap.sort;
     my int @expected = @array.sort.reverse;

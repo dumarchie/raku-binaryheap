@@ -1,9 +1,9 @@
-use BinaryHeap;
+use BinaryHeap <GenHeap>;
 
 my \n      = 2**19;
 my @values = (^n).roll(n);
 
-my $heap = BinaryHeap.new;
+my $heap = GenHeap.new;
 my $time = now;
 for @values {
     $heap.push: $_;

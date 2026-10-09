@@ -114,19 +114,19 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
     }
 
     # Insert values into a heap
-    proto method push(|) {*}
-    multi method push(::?CLASS:U $_ is rw: **@values is raw --> BinaryHeap:D) {
+    proto method push(| --> ::?CLASS:D) {*}
+    multi method push(::?CLASS:U $_ is rw: **@values is raw) {
         $_ = self.CREATE.push(|@values);
     }
-    multi method push(::?CLASS:D: **@values is raw --> BinaryHeap:D) {
+    multi method push(::?CLASS:D: **@values is raw) {
         self!insert($_) for @values;
         self;
     }
-    multi method push(::?CLASS:D: Slip \values --> BinaryHeap:D) {
+    multi method push(::?CLASS:D: Slip \values) {
         self!insert($_) for values;
         self;
     }
-    multi method push(::?CLASS:D: Mu \value --> BinaryHeap:D) {
+    multi method push(::?CLASS:D: Mu \value) {
         self!insert(value);
         self;
     }
@@ -203,14 +203,16 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
     }
 }
 
-class BinaryHeap::MaxHeap does BinaryHeap[* cmp * == More] is Parameterizable {
+my constant GenHeap = BinaryHeap; 
+
+class BinaryHeap::MaxHeap does GenHeap[* cmp * == More] is Parameterizable {
     method MIXIN(&infix:<cmp>) {
         my &precedes = * cmp * == More;
         BinaryHeap[&precedes];
     }
 }
 
-class BinaryHeap::MinHeap does BinaryHeap[* cmp * == Less] is Parameterizable {
+class BinaryHeap::MinHeap does GenHeap[* cmp * == Less] is Parameterizable {
     method MIXIN(&infix:<cmp>) {
         my &precedes = * cmp * == Less;
         BinaryHeap[&precedes];
@@ -218,7 +220,7 @@ class BinaryHeap::MinHeap does BinaryHeap[* cmp * == Less] is Parameterizable {
 }
 
 package BinaryHeap::Utils {
-    multi sub infix:<eqv>(BinaryHeap \a, BinaryHeap \b --> Bool:D)
+    multi sub infix:<eqv>(GenHeap \a, GenHeap \b --> Bool:D)
                           is export(:MANDATORY) {
         a.WHAT === b.WHAT && a.values eqv b.values;
     }
@@ -235,17 +237,25 @@ package BinaryHeap::Utils {
     }
 
     # Dynamic heap factories
-    our proto max-heap(| --> BinaryHeap:D) is export(:max-heap) {*}
+    our proto max-heap(|) is export(:max-heap) {*}
     multi sub max-heap(@values?) { BinaryHeap::MaxHeap.new(@values) }
     multi sub max-heap(&infix:<cmp>, @values?) {
-        BinaryHeap[* cmp * == More].new(@values);
+        GenHeap[* cmp * == More].new(@values);
     }
 
-    our proto min-heap(| --> BinaryHeap:D) is export(:min-heap) {*}
+    our proto min-heap(|) is export(:min-heap) {*}
     multi sub min-heap(@values?) { BinaryHeap::MinHeap.new(@values) }
     multi sub min-heap(&infix:<cmp>, @values?) {
-        BinaryHeap[* cmp * == Less].new(@values);
+        GenHeap[* cmp * == Less].new(@values);
     }
+}
+
+my %EXPORT := Map.new(
+    'GenHeap' => GenHeap,
+);
+
+sub EXPORT(**@keys) {
+    Map.new(@keys.map({ $_ => %EXPORT{$_} }))
 }
 
 
@@ -261,7 +271,7 @@ BinaryHeap - Array-based binary heap supporting heapsort
 use BinaryHeap;
 
 my BinaryHeap::MinHeap $heap;
-$heap.push(42, 11);
+$heap.push(11, 42);
 say $heap.pop; # OUTPUT: «11␤»
 say $heap.top; # OUTPUT: «42␤»
 =end code
@@ -279,16 +289,17 @@ known as the L<top|#method_top> of the heap, has a priority higher than or equal
 to all other nodes of the tree. The default relation defines a I<min-heap>, i.e.
 the top value compares C<Less> than or C<Same> as every other value on the heap.
 
-Module C<BinaryHeap> provides two classes that mix in the role:
+Module C<BinaryHeap> provides two classes that do the binary heap 
+L<role|#constant_GenHeap>:
 
 =begin item
-C<class BinaryHeap::MaxHeap does BinaryHeap[* cmp * == More]>
+C<class BinaryHeap::MaxHeap does GenHeap[* cmp * == More]>
 
 In a I<max-heap>, a child node never compares C<More> than its parent node.
 =end item
 
 =begin item
-C<class BinaryHeap::MinHeap does BinaryHeap[* cmp * == Less]>
+C<class BinaryHeap::MinHeap does GenHeap[* cmp * == Less]>
 
 In a I<min-heap>, a child node never compares C<Less> than its parent node.
 =end item
@@ -297,23 +308,24 @@ I<Deprecated:> these classes are parameterizable with a custom three-way
 comparison operator. For example, the following code constrains lexical variable
 C<$heap> to a I<max-heap> that compares objects by their C<.key>:
 
-    my BinaryHeap::MaxHeap[*.key cmp *.key] $heap;
+    my BinaryHeap::MaxHeap[*.value cmp *.value] $heap;
 
 This parameterization is deprecated because it relies on Rakudo-specific
-internals. There are two alternatives for defining a C<BinaryHeap> with a custom
+internals. There are two alternatives for defining a binary heap with a custom
 comparator. The first is to define a custom class, for example:
 
-    my class MaxHeap does BinaryHeap[*.key cmp *.key == More] {}
+    use BinaryHeap 'GenHeap';
+
+    my class MaxHeap does GenHeap[*.value cmp *.value == More] {}
 
 A concise alternative is to use a dynamic object factory:
 
-    my $max-heap = max-heap(*.key cmp *.key);
+    my $max-heap = max-heap(*.value cmp *.value);
 
-An uninitialized C<BinaryHeap> is a valid representation of an empty heap. This
-means that all public methods can be called on a type object. Methods that may
-add values to the heap autovivify an uninitialized invocant, which means they
-can only be called on a I<container> that stores or defaults to a I<class> type.
-For example:
+In many cases, an uninitialized binary heap can be approached as if it were an
+empty heap. Methods that may add values to the heap autovivify an uninitialized
+invocant, which means they can only be called on a I<container> that is
+constrained to (or stores) a I<class> type. For example:
 
     my MaxHeap $heap;
     say $heap.values;      # OUTPUT: «()␤»
@@ -322,23 +334,29 @@ For example:
 
 =head1 EXPORTS
 
-    use BinaryHeap :heapsort, :max-heap, :min-heap
+    use BinaryHeap <GenHeap>, :heapsort, :max-heap, :min-heap
 
-Module C<BinaryHeap> exports useful subroutines from the C<BinaryHeap::Utils>
-package. Apart from the mandatory C<infix:<eqv>> export, they can be accessed
-by fully qualified name when importing the short name is inconvenient.
+Module C<BinaryHeap> optionally exports the role that implements a binary heap,
+along with some useful subroutines. The specialized C<infix:<eqv>> candidate is
+a mandatory export, and only C<&heapsort> is exported by default.
+
+=head2 constant GenHeap
+
+In API version 1 this is just an alias for C<role BinaryHeap>. The fully
+qualified name of the role may change in a future API version, but C<GenHeap>
+defines a stable alias that can be used in signatures and class definitions.
 
 =head2 infix eqv
 
 Defined as:
 
-    multi sub infix:<eqv>(BinaryHeap \a, BinaryHeap \b --> Bool:D)
+    multi sub infix:<eqv>(GenHeap \a, GenHeap \b --> Bool:D)
 
 Returns C<True> if and only if the two heaps are of the same type and contain
 equivalent L<values|#method_values>. Note that a class is a different type than
- a role, so C<BinaryHeap.new eqv BinaryHeap> returns C<False>, not because role
- C<BinaryHeap> is undefined, but because C<BinaryHeap.new> returns an instance
- of a I<class> with the same name as the role.
+ a role, so C<GenHeap.new eqv GenHeap> returns C<False>, not because role
+ C<GenHeap> is undefined, but because C<GenHeap.new> returns an instance of a
+ I<class> with the same name as the role.
 
 =head2 sub heapsort
 
@@ -363,25 +381,25 @@ sort|https://en.wikipedia.org/wiki/Sorting_algorithm#Stability>.
 
 Defined as:
 
-    proto sub max-heap(| --> BinaryHeap:D) is export(:max-heap)
+    proto sub max-heap(|) is export(:max-heap)
     multi sub max-heap(@values?)
     multi sub max-heap(&infix:<cmp>, @values?)
 
 Returns a standard C<BinaryHeap::MaxHeap> instance if called without a
-comparator. Otherwise returns a custom C<BinaryHeap[* cmp * == More]> instance.
-The provided values are stored on the heap.
+comparator. Otherwise returns a custom C<GenHeap[* cmp * == More]> instance. The
+provided values are stored on the heap.
 
 =head2 sub min-heap
 
 Defined as:
 
-    proto sub min-heap(| --> BinaryHeap:D) is export(:min-heap)
+    proto sub min-heap(|) is export(:min-heap)
     multi sub min-heap(@values?)
     multi sub min-heap(&infix:<cmp>, @values?)
 
 Returns a standard C<BinaryHeap::MinHeap> instance if called without a
-comparator. Otherwise returns a custom C<BinaryHeap[* cmp * == Less]> instance.
-The provided values are stored on the heap.
+comparator. Otherwise returns a custom C<GenHeap[* cmp * == Less]> instance. The
+provided values are stored on the heap.
 
 =head1 METHODS
 
@@ -470,9 +488,9 @@ or returns a C<Failure> if the heap is empty.
 
 =head2 method push
 
-Defined as:
+Conceptually defined as:
 
-    method push(**@values --> BinaryHeap:D)
+    method push(**@values --> ::?CLASS:D)
 
 Inserts the provided values into the heap and returns the modified heap.
 Autovivifies the invocant if called on a container storing or defaulting to a

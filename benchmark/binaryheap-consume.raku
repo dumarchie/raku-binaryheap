@@ -1,7 +1,7 @@
-use BinaryHeap;
+use BinaryHeap <GenHeap>;
 
 my \n    = 2**16;
-my $heap = BinaryHeap.new: (^n).roll(n);
+my $heap = GenHeap.new: (^n).roll(n);
 my $time = now;
 $heap.consume;
 $time = now - $time;
