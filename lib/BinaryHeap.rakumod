@@ -117,18 +117,19 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
 
     # Insert values into a heap
     proto method push(| --> ::?CLASS:D) {*}
-    multi method push(::?CLASS:U $_ is rw: **@values is raw) {
+    multi method push(::?ROLE:U $_ is rw: **@values is raw) {
+        # Note: this may yield a different heap structure than .new
         $_ = self.CREATE.push(|@values);
     }
-    multi method push(::?CLASS:D: **@values is raw) {
+    multi method push(::?ROLE:D: **@values is raw) {
         self!insert($_) for @values;
         self;
     }
-    multi method push(::?CLASS:D: Slip \values) {
+    multi method push(::?ROLE:D: Slip \values) {
         self!insert($_) for values;
         self;
     }
-    multi method push(::?CLASS:D: Mu \value) {
+    multi method push(::?ROLE:D: Mu \value) {
         self!insert(value);
         self;
     }
