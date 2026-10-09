@@ -1,4 +1,4 @@
-use BinaryHeap;
+use BinaryHeap <&heapsort>;
 
 my \n     = 2**16;
 my @array = (^n).roll(n);

@@ -1,7 +1,7 @@
 use Test;
 plan 6;
 
-use BinaryHeap :min-heap;
+use BinaryHeap <&min-heap>;
 
 is min-heap.gist, Empty.gist, 'min-heap.gist';
 is min-heap.raku, 'BinaryHeap::MinHeap.new', 'min-heap.raku';

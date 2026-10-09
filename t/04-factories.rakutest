@@ -1,7 +1,7 @@
 use Test;
 plan 3;
 
-use BinaryHeap :max-heap, :min-heap;
+use BinaryHeap <&max-heap &min-heap>;
 
 subtest 'imports', {
     nok MY::<&heapsort>:exists, '&heapsort is not imported';
