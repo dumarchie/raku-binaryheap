@@ -255,6 +255,7 @@ package BinaryHeap::Utils {
 
 my %EXPORT := Map.new(
     'GenHeap' => GenHeap,
+    '&heapsort' => &BinaryHeap::Utils::heapsort,
 );
 
 sub EXPORT(**@keys) {
@@ -337,7 +338,7 @@ constrained to (or stores) a I<class> type. For example:
 
 =head1 EXPORTS
 
-    use BinaryHeap <GenHeap>, :heapsort, :max-heap, :min-heap
+    use BinaryHeap <GenHeap &heapsort>;
 
 Module C<BinaryHeap> optionally exports the role that implements a binary heap,
 along with some useful subroutines. The specialized C<infix:<eqv>> candidate is

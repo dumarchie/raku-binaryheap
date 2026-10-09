@@ -1,11 +1,9 @@
 use Test;
 plan 6;
 
-# Assert that
-# * &infix:<eqv> is a mandatory import
-# * &heapsort is a default import
-use BinaryHeap <GenHeap>, :DEFAULT;
+use BinaryHeap <GenHeap &heapsort>;
 
+# Assert that &infix:<eqv> is a mandatory import
 subtest 'infix eqv', {
     ok &infix:<eqv>.candidates.grep(
         *.package === BinaryHeap::Utils

@@ -58,7 +58,7 @@ In many cases, an uninitialized binary heap can be approached as if it were an e
 EXPORTS
 =======
 
-    use BinaryHeap <GenHeap>, :heapsort, :max-heap, :min-heap
+    use BinaryHeap <GenHeap &heapsort>;
 
 Module `BinaryHeap` optionally exports the role that implements a binary heap, along with some useful subroutines. The specialized `infix:<eqv>` candidate is a mandatory export, and only `&heapsort` is exported by default.
 
