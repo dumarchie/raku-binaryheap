@@ -1,5 +1,5 @@
 use Test;
-plan 6;
+plan 7;
 
 use BinaryHeap <GenHeap &heapsort>;
 
@@ -15,6 +15,12 @@ subtest 'infix eqv', {
     is BinaryHeap::MaxHeap.new eqv BinaryHeap::MaxHeap, True,
       'BinaryHeap::MaxHeap.new eqv BinaryHeap::MaxHeap';
 }
+
+# Assert that trying to import unexported symbols throws
+throws-like "use BinaryHeap <Foo &heapify>", Exception,
+  message => "Trying to import from 'BinaryHeap', but the following "
+           ~ "symbols are not exported: Foo, &heapify",
+  "Can't import symbols that are not exported";
 
 # Assert that &heapsort is accessible via package BinaryHeap::Utils
 sub is-proto(&got, &expected, $desc = '') {

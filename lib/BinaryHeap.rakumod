@@ -261,6 +261,11 @@ my %EXPORT := Map.new(
 );
 
 sub EXPORT(**@keys) {
+    if my @missing = @keys.grep({ %EXPORT{$_}:!exists }) {
+        die "Trying to import from 'BinaryHeap', "
+          ~ "but the following symbols are not exported: "
+          ~ @missing.join(', ');
+    }
     Map.new(@keys.map({ $_ => %EXPORT{$_} }))
 }
 
