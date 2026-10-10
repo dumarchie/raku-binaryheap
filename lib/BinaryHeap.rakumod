@@ -255,6 +255,8 @@ package BinaryHeap::Utils {
 
 my %EXPORT := Map.new(
     'GenHeap'   => GenHeap,
+    'MaxHeap'   => BinaryHeap::MaxHeap,
+    'MinHeap'   => BinaryHeap::MinHeap,
     '&heapsort' => &BinaryHeap::Utils::heapsort,
     '&max-heap' => &BinaryHeap::Utils::max-heap,
     '&min-heap' => &BinaryHeap::Utils::min-heap,
@@ -357,6 +359,14 @@ In API version 1 this is just an alias for C<role BinaryHeap>. The fully
 qualified name of the role may change in a future API version, but C<GenHeap>
 defines a stable alias that can be used in signatures and class definitions.
 
+=head2 class MaxHeap
+
+The short name of C<class BinaryHeap::MaxHeap>.
+
+=head2 class MinHeap
+
+The short name of C<class BinaryHeap::MinHeap>.
+
 =head2 infix eqv
 
 Defined as:
@@ -396,9 +406,11 @@ Defined as:
     multi sub max-heap(@values?)
     multi sub max-heap(&infix:<cmp>, @values?)
 
-Returns a standard C<BinaryHeap::MaxHeap> instance if called without a
-comparator. Otherwise returns a custom C<GenHeap[* cmp * == More]> instance. The
-provided values are stored on the heap.
+Returns a custom C<GenHeap[* cmp * == More]> instance if called with a
+comparator. The provided values are stored on the heap.
+
+The candidate that uses the default C<&infix:<cmp>> is I<deprecated> as it is
+just syntactic sugar for C<BinaryHeap::MaxHeap.new>.
 
 =head2 sub min-heap
 
@@ -408,9 +420,11 @@ Defined as:
     multi sub min-heap(@values?)
     multi sub min-heap(&infix:<cmp>, @values?)
 
-Returns a standard C<BinaryHeap::MinHeap> instance if called without a
-comparator. Otherwise returns a custom C<GenHeap[* cmp * == Less]> instance. The
-provided values are stored on the heap.
+Returns a custom C<GenHeap[* cmp * == Less]> instance if called with a
+comparator. The provided values are stored on the heap.
+
+The candidate that uses the default C<&infix:<cmp>> is I<deprecated> as it is
+just syntactic sugar for C<BinaryHeap::MinHeap.new>.
 
 =head1 METHODS
 

@@ -1,7 +1,7 @@
 use Test;
 plan 3;
 
-use BinaryHeap <&max-heap &min-heap>;
+use BinaryHeap <MaxHeap MinHeap &max-heap &min-heap>;
 
 subtest 'imports', {
     nok MY::<&heapsort>:exists, '&heapsort is not imported';
@@ -22,9 +22,9 @@ subtest 'imports', {
 my @values = 'foo' => 1, 'bar'=> 2, 'foobar' => 3, 'baz' => 4;
 
 subtest 'max-heap', {
-    cmp-ok max-heap(), 'eqv', BinaryHeap::MaxHeap.new, 'max-heap()';
+    cmp-ok max-heap(), 'eqv', MaxHeap.new, 'max-heap()';
 
-    cmp-ok max-heap(@values), 'eqv', BinaryHeap::MaxHeap.new(@values),
+    cmp-ok max-heap(@values), 'eqv', MaxHeap.new(@values),
       'max-heap(@values)';
 
     my $heap = max-heap(*.value <=> *.value, @values);
@@ -33,9 +33,9 @@ subtest 'max-heap', {
 }
 
 subtest 'min-heap', {
-    cmp-ok min-heap(), 'eqv', BinaryHeap::MinHeap.new, 'min-heap()';
+    cmp-ok min-heap(), 'eqv', MinHeap.new, 'min-heap()';
 
-    cmp-ok min-heap(@values), 'eqv', BinaryHeap::MinHeap.new(@values),
+    cmp-ok min-heap(@values), 'eqv', MinHeap.new(@values),
       'min-heap(@values)';
 
     my $heap = min-heap(*.value <=> *.value, @values);

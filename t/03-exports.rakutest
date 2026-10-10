@@ -1,7 +1,7 @@
 use Test;
 plan 7;
 
-use BinaryHeap <GenHeap &heapsort>;
+use BinaryHeap <GenHeap MaxHeap &heapsort>;
 
 # Assert that &infix:<eqv> is a mandatory import
 subtest 'infix eqv', {
@@ -12,8 +12,8 @@ subtest 'infix eqv', {
     is GenHeap.new eqv GenHeap, False,
       'GenHeap.new eqv GenHeap';
 
-    is BinaryHeap::MaxHeap.new eqv BinaryHeap::MaxHeap, True,
-      'BinaryHeap::MaxHeap.new eqv BinaryHeap::MaxHeap';
+    is MaxHeap.new eqv MaxHeap, True,
+      'MaxHeap.new eqv MaxHeap';
 }
 
 # Assert that trying to import unexported symbols throws

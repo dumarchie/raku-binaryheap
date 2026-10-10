@@ -60,12 +60,22 @@ EXPORTS
 
     use BinaryHeap <GenHeap &heapsort>;
 
-Module `BinaryHeap` optionally exports the role that implements a binary heap, along with some useful subroutines. The specialized `infix:<eqv>` candidate is a mandatory export, and only `&heapsort` is exported by default.
+Module `BinaryHeap` optionally exports the role that implements a binary heap, along with some useful subroutines. The specialized `&infix:<eqv>` candidate is a mandatory export, and only `&heapsort` is exported by default.
 
 constant GenHeap
 ----------------
 
 In API version 1 this is just an alias for `role BinaryHeap`. The fully qualified name of the role may change in a future API version, but `GenHeap` defines a stable alias that can be used in signatures and class definitions.
+
+class MaxHeap
+-------------
+
+The short name of `class BinaryHeap::MaxHeap`.
+
+class MinHeap
+-------------
+
+The short name of `class BinaryHeap::MinHeap`.
 
 infix eqv
 ---------
@@ -101,7 +111,9 @@ Defined as:
     multi sub max-heap(@values?)
     multi sub max-heap(&infix:<cmp>, @values?)
 
-Returns a standard `BinaryHeap::MaxHeap` instance if called without a comparator. Otherwise returns a custom `GenHeap[* cmp * == More]` instance. The provided values are stored on the heap.
+Returns a custom `GenHeap[* cmp * == More]` instance if called with a comparator. The provided values are stored on the heap.
+
+The candidate that uses the default `&infix:<cmp>` is *deprecated* as it is just syntactic sugar for `BinaryHeap::MaxHeap.new`.
 
 sub min-heap
 ------------
@@ -112,7 +124,9 @@ Defined as:
     multi sub min-heap(@values?)
     multi sub min-heap(&infix:<cmp>, @values?)
 
-Returns a standard `BinaryHeap::MinHeap` instance if called without a comparator. Otherwise returns a custom `GenHeap[* cmp * == Less]` instance. The provided values are stored on the heap.
+Returns a custom `GenHeap[* cmp * == Less]` instance if called with a comparator. The provided values are stored on the heap.
+
+The candidate that uses the default `&infix:<cmp>` is *deprecated* as it is just syntactic sugar for `BinaryHeap::MinHeap.new`.
 
 METHODS
 =======
