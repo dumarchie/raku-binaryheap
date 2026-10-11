@@ -15,7 +15,7 @@ unit module BinaryHeap;
 # the value of a node never precedes the value of its parent node
 proto sub infix:<precedes>($, $) {*}
 
-role GenHeap[&infix:<precedes> = * cmp * == Less] is export {
+role GenHeap[&infix:<precedes>] is export {
     # The heap is represented by @!array[^$!elems];
     # the array may contain additional elements to accommodate a heapsort.
     has @!array;
@@ -294,11 +294,11 @@ only, provide a list of symbol names to `use`.
 
 =head2 role GenHeap
 
-    role GenHeap[&infix:<precedes> = * cmp * == Less] {
+    role GenHeap[&infix:<precedes>] {
 
 Implements the heap data structure. Infix C<precedes> defines the heap
-invariant: no child node has a value that precedes the value of its parent. The
-default C<&infix:<precedes>> defines a I<min-heap>.
+invariant: no child node has a value that precedes the value of its parent. See
+below implementations of C<MaxHeap> and C<MinHeap> for examples.
 
 =head2 class MaxHeap
 

@@ -37,9 +37,9 @@ Apart from the mandatory `&infix:<eqv>` candidate, the following symbols in the 
 role GenHeap
 ------------
 
-    role GenHeap[&infix:<precedes> = * cmp * == Less] {
+    role GenHeap[&infix:<precedes>] {
 
-Implements the heap data structure. Infix `precedes` defines the heap invariant: no child node has a value that precedes the value of its parent. The default `&infix:<precedes>` defines a *min-heap*.
+Implements the heap data structure. Infix `precedes` defines the heap invariant: no child node has a value that precedes the value of its parent. See the implementations of `MaxHeap` and `MinHeap` for examples.
 
 class MaxHeap
 -------------
