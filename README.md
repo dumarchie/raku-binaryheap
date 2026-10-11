@@ -6,51 +6,23 @@ BinaryHeap - Array-based binary heap supporting heapsort
 SYNOPSIS
 ========
 
-```raku
-use BinaryHeap;
+    use BinaryHeap <MinHeap>;
 
-my BinaryHeap::MinHeap $heap;
-$heap.push(11, 42);
-say $heap.pop; # OUTPUT: «11␤»
-say $heap.top; # OUTPUT: «42␤»
-```
+    my MinHeap $heap;
+    $heap.push(11, 42);
+    say $heap.pop; # OUTPUT: «11␤»
+    say $heap.top; # OUTPUT: «42␤»
 
 DESCRIPTION
 ===========
 
-    role BinaryHeap[&infix:<precedes> = * cmp * == Less] {}
+Module `BinaryHeap` implements a heap data structure and a (naïve) `heapsort` routine. The heap data structure is implemented by role `GenHeap`, which stores values in an implicit binary tree that satisfies the **heap property**: the value of a node never *precedes* the value of its parent node.
 
-Role `BinaryHeap` stores values in an implicit binary tree that satisfies the **heap property**: the value of a node never `precedes` the value of its parent node.
+Module `BinaryHeap` provides two classes that do the `GenHeap` role using Raku's built-in three-way comparison operator: `MaxHeap` and `MinHeap`. It also provides `max-heap` and `min-heap` factory routines that accept a custom comparator, compose a class and return an instance of that class.
 
-Infix `precedes` defines a priority relation, such that the root of the tree, known as the [top](#method_top) of the heap, has a priority higher than or equal to all other nodes of the tree. The default relation defines a *min-heap*, i.e. the top value compares `Less` than or `Same` as every other value on the heap.
+In many cases, an uninitialized `GenHeap` class can be manipulated as if it were an empty object instance. Methods that add values autovivify the heap, which means they can only be called on a *container*. For example:
 
-Module `BinaryHeap` provides two classes that do the binary heap [role](#constant_GenHeap):
-
-  * `class BinaryHeap::MaxHeap does GenHeap[* cmp * == More]`
-
-    In a *max-heap*, a child node never compares `More` than its parent node.
-
-  * `class BinaryHeap::MinHeap does GenHeap[* cmp * == Less]`
-
-    In a *min-heap*, a child node never compares `Less` than its parent node.
-
-*Deprecated:* these classes are parameterizable with a custom three-way comparison operator. For example, the following code constrains lexical variable `$heap` to a *max-heap* that compares objects by their `.key`:
-
-    my BinaryHeap::MaxHeap[*.value cmp *.value] $heap;
-
-This parameterization is deprecated because it relies on Rakudo-specific internals. There are two alternatives for defining a binary heap with a custom comparator. The first is to define a custom class, for example:
-
-    use BinaryHeap 'GenHeap';
-
-    my class MaxHeap does GenHeap[*.value cmp *.value == More] {}
-
-A concise alternative is to use a dynamic object factory:
-
-    my $max-heap = max-heap(*.value cmp *.value);
-
-In many cases, an uninitialized binary heap can be approached as if it were an empty heap. Methods that may add values to the heap autovivify an uninitialized invocant, which means they can only be called on a *container* that is constrained to (or stores) a *class* type. For example:
-
-    my MaxHeap $heap;
+    my MinHeap $heap;
     say $heap.values;      # OUTPUT: «()␤»
     say $heap.replace(42); # OUTPUT: «Nil␤»
     say $heap.top;         # OUTPUT: «42␤»
@@ -60,22 +32,28 @@ EXPORTS
 
     use BinaryHeap <GenHeap &heapsort>;
 
-Module `BinaryHeap` optionally exports the role that implements a binary heap, along with some useful subroutines. The specialized `&infix:<eqv>` candidate is a mandatory export, and only `&heapsort` is exported by default.
+Apart from the mandatory `&infix:<eqv>` candidate, the following symbols in the `BinaryHeap` namespace are all exported by default. To import specific symbols only, provide a list of symbol names to `use`.
 
-constant GenHeap
-----------------
+role GenHeap
+------------
 
-In API version 1 this is just an alias for `role BinaryHeap`. The fully qualified name of the role may change in a future API version, but `GenHeap` defines a stable alias that can be used in signatures and class definitions.
+    role GenHeap[&infix:<precedes> = * cmp * == Less] {
+
+Implements the heap data structure. Infix `precedes` defines the heap invariant: no child node has a value that precedes the value of its parent. The default `&infix:<precedes>` defines a *min-heap*.
 
 class MaxHeap
 -------------
 
-The short name of `class BinaryHeap::MaxHeap`.
+    class MaxHeap does GenHeap[* cmp * == More] {}
+
+A *max-heap* that uses Raku's built-in `infix:<cmp>`.
 
 class MinHeap
 -------------
 
-The short name of `class BinaryHeap::MinHeap`.
+    class MinHeap does GenHeap[* cmp * == Less] {}
+
+A *min-heap* that uses Raku's built-in `infix:<cmp>`.
 
 infix eqv
 ---------
@@ -91,7 +69,7 @@ sub heapsort
 
 Defined as:
 
-    proto sub heapsort(|) is export(:DEFAULT, :heapsort)
+    proto sub heapsort(|)
     multi sub heapsort(@array, :$reverse)
     multi sub heapsort(&comparator, @array, :$reverse)
 
@@ -107,7 +85,7 @@ sub max-heap
 
 Defined as:
 
-    proto sub max-heap(|) is export(:max-heap)
+    proto sub max-heap(|)
     multi sub max-heap(@values?)
     multi sub max-heap(&infix:<cmp>, @values?)
 
@@ -120,7 +98,7 @@ sub min-heap
 
 Defined as:
 
-    proto sub min-heap(|) is export(:min-heap)
+    proto sub min-heap(|)
     multi sub min-heap(@values?)
     multi sub min-heap(&infix:<cmp>, @values?)
 
@@ -130,6 +108,8 @@ The candidate that uses the default `&infix:<cmp>` is *deprecated* as it is just
 
 METHODS
 =======
+
+This section documents the methods provided by role `GenHeap`.
 
 method Bool
 -----------

@@ -1,18 +1,16 @@
 {
     "perl" : "6.c",
     "name" : "BinaryHeap",
-    "api"  : "1",
+    "api"  : "2",
     "auth" : "zef:dumarchie",
-    "version" : "1.0.0",
+    "version" : "2.0.0",
     "description" : "Array-based binary heap",
     "authors" : [ "Peter du Marchie van Voorthuysen" ],
     "license" : "Artistic-2.0",
     "provides" : {
         "BinaryHeap" : "lib/BinaryHeap.rakumod"
     },
-    "depends" : [
-        "Parameterizable:auth<zef:dumarchie>"
-    ],
+    "depends" : [ ],
     "build-depends" : [ ],
     "test-depends" : [ ],
     "resources" : [ ],

@@ -1,11 +1,21 @@
-# Roles cannot autovivify, so we need parameterizable classes
-use Parameterizable;
+# The EXPORT sub must be defined outside the module scope
+sub EXPORT(**@keys) {
+    my %EXPORT = ::<BinaryHeap>.WHO;
+    if my @missing = @keys.grep({ %EXPORT{$_}:!exists }) {
+        die "Trying to import from 'BinaryHeap', "
+          ~ "but the following symbols are not exported: "
+          ~ @missing.join(", ");
+    }
+    Map.new(@keys.map({ $_ => %EXPORT{$_} }))
+}
 
-# A BinaryHeap is an implicit binary tree that satisfies the heap property:
+unit module BinaryHeap;
+
+# A heap is a binary tree that satisfies the heap invariant:
 # the value of a node never precedes the value of its parent node
 proto sub infix:<precedes>($, $) {*}
 
-role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
+role GenHeap[&infix:<precedes> = * cmp * == Less] is export {
     # The heap is represented by @!array[^$!elems];
     # the array may contain additional elements to accommodate a heapsort.
     has @!array;
@@ -206,71 +216,37 @@ role BinaryHeap[&infix:<precedes> = * cmp * == Less] {
     }
 }
 
-my constant GenHeap = BinaryHeap; 
+class MaxHeap does GenHeap[* cmp * == More] is export {}
 
-class BinaryHeap::MaxHeap does GenHeap[* cmp * == More] is Parameterizable {
-    method MIXIN(&infix:<cmp>) {
-        my &precedes = * cmp * == More;
-        BinaryHeap[&precedes];
-    }
+class MinHeap does GenHeap[* cmp * == Less] is export {}
+
+multi sub infix:<eqv>(GenHeap \a, GenHeap \b --> Bool:D) is export(:MANDATORY) {
+    a.WHAT === b.WHAT && a.values eqv b.values;
 }
 
-class BinaryHeap::MinHeap does GenHeap[* cmp * == Less] is Parameterizable {
-    method MIXIN(&infix:<cmp>) {
-        my &precedes = * cmp * == Less;
-        BinaryHeap[&precedes];
-    }
+# Heapsort
+our proto heapsort(|) is export {*}
+multi sub heapsort(@array, :$reverse) {
+    my \heap = $reverse ?? BinaryHeap::MinHeap !! BinaryHeap::MaxHeap;
+    heap.heapify(@array).sort;
+}
+multi sub heapsort(&cmp, @array, :$reverse) {
+    my \heap = $reverse ?? BinaryHeap::MinHeap !! BinaryHeap::MaxHeap;
+    heap.^parameterize(&cmp).heapify(@array).sort;
 }
 
-package BinaryHeap::Utils {
-    multi sub infix:<eqv>(GenHeap \a, GenHeap \b --> Bool:D)
-                          is export(:MANDATORY) {
-        a.WHAT === b.WHAT && a.values eqv b.values;
-    }
-
-    # Heapsort
-    our proto heapsort(|) is export(:DEFAULT, :heapsort) {*}
-    multi sub heapsort(@array, :$reverse) {
-        my \heap = $reverse ?? BinaryHeap::MinHeap !! BinaryHeap::MaxHeap;
-        heap.heapify(@array).sort;
-    }
-    multi sub heapsort(&cmp, @array, :$reverse) {
-        my \heap = $reverse ?? BinaryHeap::MinHeap !! BinaryHeap::MaxHeap;
-        heap.^parameterize(&cmp).heapify(@array).sort;
-    }
-
-    # Dynamic heap factories
-    our proto max-heap(|) is export(:max-heap) {*}
-    multi sub max-heap(@values?) { BinaryHeap::MaxHeap.new(@values) }
-    multi sub max-heap(&infix:<cmp>, @values?) {
-        GenHeap[* cmp * == More].new(@values);
-    }
-
-    our proto min-heap(|) is export(:min-heap) {*}
-    multi sub min-heap(@values?) { BinaryHeap::MinHeap.new(@values) }
-    multi sub min-heap(&infix:<cmp>, @values?) {
-        GenHeap[* cmp * == Less].new(@values);
-    }
+# Dynamic heap factories
+our proto max-heap(|) is export {*}
+multi sub max-heap(@values?) { BinaryHeap::MaxHeap.new(@values) }
+multi sub max-heap(&infix:<cmp>, @values?) {
+    GenHeap[* cmp * == More].new(@values);
 }
 
-my %EXPORT := Map.new(
-    'GenHeap'   => GenHeap,
-    'MaxHeap'   => BinaryHeap::MaxHeap,
-    'MinHeap'   => BinaryHeap::MinHeap,
-    '&heapsort' => &BinaryHeap::Utils::heapsort,
-    '&max-heap' => &BinaryHeap::Utils::max-heap,
-    '&min-heap' => &BinaryHeap::Utils::min-heap,
-);
-
-sub EXPORT(**@keys) {
-    if my @missing = @keys.grep({ %EXPORT{$_}:!exists }) {
-        die "Trying to import from 'BinaryHeap', "
-          ~ "but the following symbols are not exported: "
-          ~ @missing.join(', ');
-    }
-    Map.new(@keys.map({ $_ => %EXPORT{$_} }))
+our proto min-heap(|) is export {*}
+multi sub min-heap(@values?) { BinaryHeap::MinHeap.new(@values) }
+multi sub min-heap(&infix:<cmp>, @values?) {
+    GenHeap[* cmp * == Less].new(@values);
 }
-
 
 =begin pod
 
@@ -280,67 +256,30 @@ BinaryHeap - Array-based binary heap supporting heapsort
 
 =head1 SYNOPSIS
 
-=begin code :lang<raku>
-use BinaryHeap;
+    use BinaryHeap <MinHeap>;
 
-my BinaryHeap::MinHeap $heap;
-$heap.push(11, 42);
-say $heap.pop; # OUTPUT: «11␤»
-say $heap.top; # OUTPUT: «42␤»
-=end code
+    my MinHeap $heap;
+    $heap.push(11, 42);
+    say $heap.pop; # OUTPUT: «11␤»
+    say $heap.top; # OUTPUT: «42␤»
 
 =head1 DESCRIPTION
 
-    role BinaryHeap[&infix:<precedes> = * cmp * == Less] {}
+Module C<BinaryHeap> implements a heap data structure and a (naïve) C<heapsort>
+routine. The heap data structure is implemented by role C<GenHeap>, which stores
+values in an implicit binary tree that satisfies the B<heap property>: the value
+of a node never I<precedes> the value of its parent node.
 
-Role C<BinaryHeap> stores values in an implicit binary tree that satisfies the
-B<heap property>: the value of a node never C<precedes> the value of its parent
-node.
+Module C<BinaryHeap> provides two classes that do the C<GenHeap> role using
+Raku's built-in three-way comparison operator: C<MaxHeap> and C<MinHeap>. It
+also provides C<max-heap> and C<min-heap> factory routines that accept a custom
+comparator, compose a class and return an instance of that class.
 
-Infix C<precedes> defines a priority relation, such that the root of the tree,
-known as the L<top|#method_top> of the heap, has a priority higher than or equal
-to all other nodes of the tree. The default relation defines a I<min-heap>, i.e.
-the top value compares C<Less> than or C<Same> as every other value on the heap.
+In many cases, an uninitialized C<GenHeap> class can be manipulated as if it
+were an empty object instance. Methods that add values autovivify the heap,
+which means they can only be called on a I<container>. For example:
 
-Module C<BinaryHeap> provides two classes that do the binary heap 
-L<role|#constant_GenHeap>:
-
-=begin item
-C<class BinaryHeap::MaxHeap does GenHeap[* cmp * == More]>
-
-In a I<max-heap>, a child node never compares C<More> than its parent node.
-=end item
-
-=begin item
-C<class BinaryHeap::MinHeap does GenHeap[* cmp * == Less]>
-
-In a I<min-heap>, a child node never compares C<Less> than its parent node.
-=end item
-
-I<Deprecated:> these classes are parameterizable with a custom three-way
-comparison operator. For example, the following code constrains lexical variable
-C<$heap> to a I<max-heap> that compares objects by their C<.key>:
-
-    my BinaryHeap::MaxHeap[*.value cmp *.value] $heap;
-
-This parameterization is deprecated because it relies on Rakudo-specific
-internals. There are two alternatives for defining a binary heap with a custom
-comparator. The first is to define a custom class, for example:
-
-    use BinaryHeap 'GenHeap';
-
-    my class MaxHeap does GenHeap[*.value cmp *.value == More] {}
-
-A concise alternative is to use a dynamic object factory:
-
-    my $max-heap = max-heap(*.value cmp *.value);
-
-In many cases, an uninitialized binary heap can be approached as if it were an
-empty heap. Methods that may add values to the heap autovivify an uninitialized
-invocant, which means they can only be called on a I<container> that is
-constrained to (or stores) a I<class> type. For example:
-
-    my MaxHeap $heap;
+    my MinHeap $heap;
     say $heap.values;      # OUTPUT: «()␤»
     say $heap.replace(42); # OUTPUT: «Nil␤»
     say $heap.top;         # OUTPUT: «42␤»
@@ -349,23 +288,29 @@ constrained to (or stores) a I<class> type. For example:
 
     use BinaryHeap <GenHeap &heapsort>;
 
-Module C<BinaryHeap> optionally exports the role that implements a binary heap,
-along with some useful subroutines. The specialized C<&infix:<eqv>> candidate is
-a mandatory export, and only C<&heapsort> is exported by default.
+Apart from the mandatory C<&infix:<eqv>> candidate, the following symbols in the
+C<BinaryHeap> namespace are all exported by default. To import specific symbols
+only, provide a list of symbol names to `use`.
 
-=head2 constant GenHeap
+=head2 role GenHeap
 
-In API version 1 this is just an alias for C<role BinaryHeap>. The fully
-qualified name of the role may change in a future API version, but C<GenHeap>
-defines a stable alias that can be used in signatures and class definitions.
+    role GenHeap[&infix:<precedes> = * cmp * == Less] {
+
+Implements the heap data structure. Infix C<precedes> defines the heap
+invariant: no child node has a value that precedes the value of its parent. The
+default C<&infix:<precedes>> defines a I<min-heap>.
 
 =head2 class MaxHeap
 
-The short name of C<class BinaryHeap::MaxHeap>.
+    class MaxHeap does GenHeap[* cmp * == More] {}
+
+A I<max-heap> that uses Raku's built-in C<infix:<cmp>>.
 
 =head2 class MinHeap
 
-The short name of C<class BinaryHeap::MinHeap>.
+    class MinHeap does GenHeap[* cmp * == Less] {}
+
+A I<min-heap> that uses Raku's built-in C<infix:<cmp>>.
 
 =head2 infix eqv
 
@@ -383,7 +328,7 @@ equivalent L<values|#method_values>. Note that a class is a different type than
 
 Defined as:
 
-    proto sub heapsort(|) is export(:DEFAULT, :heapsort)
+    proto sub heapsort(|)
     multi sub heapsort(@array, :$reverse)
     multi sub heapsort(&comparator, @array, :$reverse)
 
@@ -402,7 +347,7 @@ sort|https://en.wikipedia.org/wiki/Sorting_algorithm#Stability>.
 
 Defined as:
 
-    proto sub max-heap(|) is export(:max-heap)
+    proto sub max-heap(|)
     multi sub max-heap(@values?)
     multi sub max-heap(&infix:<cmp>, @values?)
 
@@ -416,7 +361,7 @@ just syntactic sugar for C<BinaryHeap::MaxHeap.new>.
 
 Defined as:
 
-    proto sub min-heap(|) is export(:min-heap)
+    proto sub min-heap(|)
     multi sub min-heap(@values?)
     multi sub min-heap(&infix:<cmp>, @values?)
 
@@ -427,6 +372,8 @@ The candidate that uses the default C<&infix:<cmp>> is I<deprecated> as it is
 just syntactic sugar for C<BinaryHeap::MinHeap.new>.
 
 =head1 METHODS
+
+This section documents the methods provided by role C<GenHeap>.
 
 =head2 method Bool
 
