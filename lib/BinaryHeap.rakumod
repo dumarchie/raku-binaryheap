@@ -83,21 +83,18 @@ role GenHeap[&infix:<precedes>] is export {
     multi method new(**@values) {
         self.CREATE!SET-SELF(@values);
     }
-    multi method new(Iterable \value) {
+    multi method new(Iterable \value, Bool() :$in-place) {
+        my @values;
         if value.VAR !=== value {
-            self.CREATE!SET-SELF([value]);
+            @values = value;
         }
         elsif value ~~ Array|array {
-            self.CREATE!SET-SELF(value.clone);
+            @values := $in-place ?? value !! value.clone;
         }
         else {
-            self.CREATE!SET-SELF(value.Array);
+            @values := value.Array;
         }
-    }
-
-    # DEPRECATED: Heapify an array without cloning
-    method heapify(@array --> ::?CLASS:D) {
-        self.CREATE!SET-SELF(@array);
+        self.CREATE!SET-SELF(@values);
     }
 
     # A heap has the type constraint of the underlying array
@@ -227,25 +224,29 @@ multi sub infix:<eqv>(GenHeap \a, GenHeap \b --> Bool:D) is export(:MANDATORY) {
 # Heapsort
 our proto heapsort(|) is export {*}
 multi sub heapsort(@array, :$reverse) {
-    my \heap = $reverse ?? BinaryHeap::MinHeap !! BinaryHeap::MaxHeap;
-    heap.heapify(@array).sort;
+    my \Heap = $reverse ?? MinHeap !! MaxHeap;
+    Heap.new(@array, :in-place).sort;
 }
 multi sub heapsort(&cmp, @array, :$reverse) {
-    my \heap = $reverse ?? BinaryHeap::MinHeap !! BinaryHeap::MaxHeap;
-    heap.^parameterize(&cmp).heapify(@array).sort;
+    my &heap := $reverse ?? &min-heap !! &max-heap;
+    heap(&cmp, @array, :in-place).sort;
 }
 
 # Dynamic heap factories
 our proto max-heap(|) is export {*}
-multi sub max-heap(@values?) { BinaryHeap::MaxHeap.new(@values) }
-multi sub max-heap(&infix:<cmp>, @values?) {
-    GenHeap[* cmp * == More].new(@values);
+multi sub max-heap(&cmp, **@values) {
+    max-heap(&cmp, @values, :in-place);
+}
+multi sub max-heap(&infix:<cmp>, Iterable \values, Bool() :$in-place) {
+    GenHeap[* cmp * == More].new(values, :$in-place);
 }
 
 our proto min-heap(|) is export {*}
-multi sub min-heap(@values?) { BinaryHeap::MinHeap.new(@values) }
-multi sub min-heap(&infix:<cmp>, @values?) {
-    GenHeap[* cmp * == Less].new(@values);
+multi sub min-heap(&cmp, **@values) {
+    min-heap(&cmp, @values, :in-place);
+}
+multi sub min-heap(&infix:<cmp>, Iterable \values, Bool() :$in-place) {
+    GenHeap[* cmp * == Less].new(values, :$in-place);
 }
 
 =begin pod
@@ -265,10 +266,10 @@ BinaryHeap - Array-based binary heap supporting heapsort
 
 =head1 DESCRIPTION
 
-Module C<BinaryHeap> implements a heap data structure and a (naïve) C<heapsort>
-routine. The heap data structure is implemented by role C<GenHeap>, which stores
-values in an implicit binary tree that satisfies the B<heap property>: the value
-of a node never I<precedes> the value of its parent node.
+Module C<BinaryHeap> implements a heap data structure and an (in-place)
+C<heapsort> routine. The heap data structure is implemented by role C<GenHeap>,
+which stores values in an implicit binary tree that satisfies the B<heap
+property>: the value of a node never I<precedes> the value of its parent node.
 
 Module C<BinaryHeap> provides two classes that do the C<GenHeap> role using
 Raku's built-in three-way comparison operator: C<MaxHeap> and C<MinHeap>. It
@@ -319,26 +320,24 @@ Defined as:
     multi sub infix:<eqv>(GenHeap \a, GenHeap \b --> Bool:D)
 
 Returns C<True> if and only if the two heaps are of the same type and contain
-equivalent L<values|#method_values>. Note that a class is a different type than
- a role, so C<GenHeap.new eqv GenHeap> returns C<False>, not because role
- C<GenHeap> is undefined, but because C<GenHeap.new> returns an instance of a
- I<class> with the same name as the role.
+equivalent L<values|#method_values>.
 
 =head2 sub heapsort
 
 Defined as:
 
     proto sub heapsort(|)
-    multi sub heapsort(@array, :$reverse)
-    multi sub heapsort(&comparator, @array, :$reverse)
+    multi sub heapsort(@values, :$reverse)
+    multi sub heapsort(&comparator, @values, :$reverse)
 
-Sorts and returns the C<@array>, using a custom three-way C<&comparator> if
-provided. By default the array is sorted in ascending order, but it is sorted in
-descending order if C<:$reverse> is true. Hence, the following statements both
-put the elements of the array in descending order:
+Sorts C<@values> in-place if it is an array; otherwise returns a new C<Array>
+with the sorted values. Values are sorted using the provided three-way
+C<&comparator> or Raku's built-in C<&infix:<cmp>>. By default values are sorted
+in ascending order, but they are sorted in descending order if C<:$reverse> is
+true. Hence, the following statements both put the values in descending order:
 
-    heapsort @array, :reverse;
-    heapsort -(* cmp *), @array;
+    heapsort @values, :reverse;
+    heapsort -(* cmp *), @values;
 
 Note that C<heapsort> is not a L<stable
 sort|https://en.wikipedia.org/wiki/Sorting_algorithm#Stability>.
@@ -347,29 +346,23 @@ sort|https://en.wikipedia.org/wiki/Sorting_algorithm#Stability>.
 
 Defined as:
 
-    proto sub max-heap(|)
-    multi sub max-heap(@values?)
-    multi sub max-heap(&infix:<cmp>, @values?)
+    sub max-heap(&infix:<cmp>, +values, Bool() :$in-place)
 
-Returns a custom C<GenHeap[* cmp * == More]> instance if called with a
-comparator. The provided values are stored on the heap.
-
-The candidate that uses the default C<&infix:<cmp>> is I<deprecated> as it is
-just syntactic sugar for C<BinaryHeap::MaxHeap.new>.
+Returns a custom C<GenHeap[* cmp * == More]> instance storing the provided
+values. If C<values> is a single, non-itemized array, the C<:in-place> adverb
+causes the array to be heapified in place. By default, an array is cloned before
+heapification.
 
 =head2 sub min-heap
 
 Defined as:
 
-    proto sub min-heap(|)
-    multi sub min-heap(@values?)
-    multi sub min-heap(&infix:<cmp>, @values?)
+    sub min-heap(&infix:<cmp>, +values, Bool() :$in-place)
 
-Returns a custom C<GenHeap[* cmp * == Less]> instance if called with a
-comparator. The provided values are stored on the heap.
-
-The candidate that uses the default C<&infix:<cmp>> is I<deprecated> as it is
-just syntactic sugar for C<BinaryHeap::MinHeap.new>.
+Returns a custom C<GenHeap[* cmp * == Less]> instance storing the provided
+values. If C<values> is a single, non-itemized array, the C<:in-place> adverb
+causes the array to be heapified in place. By default, an array is cloned before
+heapification.
 
 =head1 METHODS
 
@@ -419,25 +412,16 @@ Defined as:
 
 Returns the gist of the array underlying the heap.
 
-=head2 method heapify
+=head2 method new
 
 Defined as:
 
-    method heapify(@array --> ::?CLASS:D)
+    method new(+values, Bool() :$in-place --> ::?CLASS:D)
 
-Constructs a new heap based on the I<provided> array, whose elements are put in
-heap order. This method is I<deprecated> because it breaks encapsulation; use
-C<.new(@array)> to create a heap with a type constraint on elements.
-
-=head2 method new
-
-Conceptually defined as:
-
-    method new(+values --> ::?CLASS:D)
-
-Constructs a new heap storing the provided values. If values are provided as a 
-single, non-itemized array, the type constraint of the array applies to all
-values on the heap.
+Constructs a new heap containing the provided values. If C<values> is a single,
+non-itemized array, the C<:in-place> adverb causes the array to be heapified in
+place. By default, an array is cloned before heapification. In either case, the
+array's type constraint applies to all values in the heap.
 
 =head2 method of
 
@@ -460,7 +444,7 @@ or returns a C<Failure> if the heap is empty.
 
 =head2 method push
 
-Conceptually defined as:
+Defined as:
 
     method push(**@values --> ::?CLASS:D)
 

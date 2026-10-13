@@ -1,16 +1,13 @@
 use Test;
 plan 7;
 
-use BinaryHeap <GenHeap MaxHeap &heapsort>;
+use BinaryHeap <MaxHeap &heapsort>;
 
 # Assert that &infix:<eqv> is a mandatory import
 subtest 'infix eqv', {
     ok &infix:<eqv>.candidates.grep(
-        *.package === BinaryHeap::Utils
-    ), '&infix:<eqv> candidate is imported from package BinaryHeap::Utils';
-
-    is GenHeap.new eqv GenHeap, False,
-      'GenHeap.new eqv GenHeap';
+        *.package === BinaryHeap
+    ), '&infix:<eqv> candidate is imported from package BinaryHeap';
 
     is MaxHeap.new eqv MaxHeap, True,
       'MaxHeap.new eqv MaxHeap';
@@ -20,16 +17,16 @@ subtest 'infix eqv', {
 throws-like "use BinaryHeap <Foo &heapify>", Exception,
   message => "Trying to import from 'BinaryHeap', but the following "
            ~ "symbols are not exported: Foo, &heapify",
-  "Can't import symbols that are not exported";
+  "can't import symbols that are not exported";
 
-# Assert that &heapsort is accessible via package BinaryHeap::Utils
+# Assert that &heapsort is accessible via package BinaryHeap
 sub is-proto(&got, &expected, $desc = '') {
     is-deeply (&got, |&got.candidates), (&expected, |&expected.candidates),
       $desc;
 }
 
-is-proto &heapsort, &BinaryHeap::Utils::heapsort,
-  'imported &heapsort is an alias for &BinaryHeap::Utils::heapsort';
+is-proto &heapsort, &BinaryHeap::heapsort,
+  'imported &heapsort is an alias for &BinaryHeap::heapsort';
 
 my \values = 25, 17, 36, 2, 19, 7, 3, 1, 100;
 subtest 'heapsort', {
