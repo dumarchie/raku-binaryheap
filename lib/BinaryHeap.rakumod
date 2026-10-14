@@ -276,9 +276,9 @@ Raku's built-in three-way comparison operator: C<MaxHeap> and C<MinHeap>. It
 also provides C<max-heap> and C<min-heap> factory routines that accept a custom
 comparator, compose a class and return an instance of that class.
 
-In many cases, an uninitialized C<GenHeap> class can be manipulated as if it
-were an empty object instance. Methods that add values autovivify the heap,
-which means they can only be called on a I<container>. For example:
+In many cases, an uninitialized heap can be manipulated as if it were an empty
+object instance. Methods that add values autovivify the heap, which means they
+can only be called on a I<container>. For example:
 
     my MinHeap $heap;
     say $heap.values;      # OUTPUT: «()␤»
@@ -330,11 +330,13 @@ Defined as:
     multi sub heapsort(@values, :$reverse)
     multi sub heapsort(&comparator, @values, :$reverse)
 
-Sorts C<@values> in-place if it is an array; otherwise returns a new C<Array>
-with the sorted values. Values are sorted using the provided three-way
-C<&comparator> or Raku's built-in C<&infix:<cmp>>. By default values are sorted
-in ascending order, but they are sorted in descending order if C<:$reverse> is
-true. Hence, the following statements both put the values in descending order:
+Sorts the values in-place and returns the array if C<@values> is an array;
+otherwise sorts and returns a new C<Array>. Values are sorted using the provided
+three-way C<&comparator> or Raku's built-in C<&infix:<cmp>>. 
+
+To sort in descending order, use the C<:reverse> adverb or negate the result of
+C<&comparator>. For example, the following statements both put the values in
+descending order:
 
     heapsort @values, :reverse;
     heapsort -(* cmp *), @values;

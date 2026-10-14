@@ -20,7 +20,7 @@ Module `BinaryHeap` implements a heap data structure and an (in-place) `heapsort
 
 Module `BinaryHeap` provides two classes that do the `GenHeap` role using Raku's built-in three-way comparison operator: `MaxHeap` and `MinHeap`. It also provides `max-heap` and `min-heap` factory routines that accept a custom comparator, compose a class and return an instance of that class.
 
-In many cases, an uninitialized `GenHeap` class can be manipulated as if it were an empty object instance. Methods that add values autovivify the heap, which means they can only be called on a *container*. For example:
+In many cases, an uninitialized heap can be manipulated as if it were an empty object instance. Methods that add values autovivify the heap, which means they can only be called on a *container*. For example:
 
     my MinHeap $heap;
     say $heap.values;      # OUTPUT: «()␤»
@@ -73,7 +73,9 @@ Defined as:
     multi sub heapsort(@values, :$reverse)
     multi sub heapsort(&comparator, @values, :$reverse)
 
-Sorts `@values` in-place if it is an array; otherwise returns a new `Array` with the sorted values. Values are sorted using the provided three-way `&comparator` or Raku's built-in `&infix:<cmp>`. By default values are sorted in ascending order, but they are sorted in descending order if `:$reverse` is true. Hence, the following statements both put the values in descending order:
+Sorts the values in-place and returns the array if `@values` is an array; otherwise sorts and returns a new `Array`. Values are sorted using the provided three-way `&comparator` or Raku's built-in `&infix:<cmp>`. 
+
+To sort in descending order, use the `:reverse` adverb or negate the result of `&comparator`. For example, the following statements both put the values in descending order:
 
     heapsort @values, :reverse;
     heapsort -(* cmp *), @values;
