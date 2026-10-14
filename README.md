@@ -70,8 +70,8 @@ sub heapsort
 Defined as:
 
     proto sub heapsort(|)
-    multi sub heapsort(@values, :$reverse)
-    multi sub heapsort(&comparator, @values, :$reverse)
+    multi sub heapsort(@values, Bool() :$reverse)
+    multi sub heapsort(&comparator, @values, Bool() :$reverse)
 
 Sorts the values in-place and returns the array if `@values` is an array; otherwise sorts and returns a new `Array`. Values are sorted using the provided three-way `&comparator` or Raku's built-in `&infix:<cmp>`. 
 

@@ -223,13 +223,13 @@ multi sub infix:<eqv>(GenHeap \a, GenHeap \b --> Bool:D) is export(:MANDATORY) {
 
 # Heapsort
 our proto heapsort(|) is export {*}
-multi sub heapsort(@array, :$reverse) {
+multi sub heapsort(@array, Bool() :$reverse) {
     my \Heap = $reverse ?? MinHeap !! MaxHeap;
     Heap.new(@array, :in-place).sort;
 }
-multi sub heapsort(&cmp, @array, :$reverse) {
-    my &heap := $reverse ?? &min-heap !! &max-heap;
-    heap(&cmp, @array, :in-place).sort;
+multi sub heapsort(&cmp, @array, Bool() :$reverse) {
+    my &make-heap := $reverse ?? &min-heap !! &max-heap;
+    make-heap(&cmp, @array, :in-place).sort;
 }
 
 # Dynamic heap factories
@@ -327,8 +327,8 @@ equivalent L<values|#method_values>.
 Defined as:
 
     proto sub heapsort(|)
-    multi sub heapsort(@values, :$reverse)
-    multi sub heapsort(&comparator, @values, :$reverse)
+    multi sub heapsort(@values, Bool() :$reverse)
+    multi sub heapsort(&comparator, @values, Bool() :$reverse)
 
 Sorts the values in-place and returns the array if C<@values> is an array;
 otherwise sorts and returns a new C<Array>. Values are sorted using the provided
