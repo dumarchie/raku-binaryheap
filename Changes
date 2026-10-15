@@ -1,10 +1,11 @@
-2.0.0
+2.0.0 2026-10-15
     - Remove dependency on module Parameterizable
     - Move exported symbols to BinaryHeap namespace
     - Remove default &infix:<precedes> from GenHeap
     - Support .new(@values, :in-place) and remove method .heapify
     - Remove method .sort
-    - Rename method .consume to .extract 
+    - Rename method .consume to .extract
+    - The custom infix eqv no longer accepts type objects
 1.0.0 2026-10-10
     - Add optional exports, including a GenHeap role alias
     - Improve performance of the .push method

@@ -9,8 +9,7 @@ subtest 'infix eqv', {
         *.package === BinaryHeap
     ), '&infix:<eqv> candidate is imported from package BinaryHeap';
 
-    is MaxHeap.new eqv MaxHeap, True,
-      'MaxHeap.new eqv MaxHeap';
+    ok MaxHeap.new !eqv MaxHeap, 'MaxHeap.new !eqv MaxHeap';
 }
 
 # Assert that trying to import unexported symbols throws

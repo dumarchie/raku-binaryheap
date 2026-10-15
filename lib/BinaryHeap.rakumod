@@ -214,7 +214,8 @@ class MaxHeap does GenHeap[* cmp * == More] is export {}
 
 class MinHeap does GenHeap[* cmp * == Less] is export {}
 
-multi sub infix:<eqv>(GenHeap \a, GenHeap \b --> Bool:D) is export(:MANDATORY) {
+multi sub infix:<eqv>(GenHeap:D \a, GenHeap:D \b --> Bool:D)
+                                            is export(:MANDATORY) {
     a.WHAT === b.WHAT && a.values eqv b.values;
 }
 
@@ -314,7 +315,7 @@ A I<min-heap> that uses Raku's built-in C<infix:<cmp>>.
 
 Defined as:
 
-    multi sub infix:<eqv>(GenHeap \a, GenHeap \b --> Bool:D)
+    multi sub infix:<eqv>(GenHeap:D \a, GenHeap:D \b --> Bool:D)
 
 Returns C<True> if and only if the two heaps are of the same type and contain
 equivalent L<values|#method_values>.
