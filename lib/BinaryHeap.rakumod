@@ -109,17 +109,17 @@ role GenHeap[&infix:<precedes>] is export {
 
     # Extract a single value from a heap
     method pop() {
-        self ?? self!extract !! Failure.new:
+        self ?? self!extract-one !! Failure.new:
           X::Cannot::Empty.new(:action<pop>, :what(self.^name));
     }
-    method !extract() {
+    method !extract-one() {
         my $value = @!array[$!elems - 1]:delete;
         --$!elems > 0 ?? self.replace($value) !! $value;
     }
 
     # Extract a Seq of values from a heap
-    method consume( --> Seq:D) {
-        gather take self!extract while self;
+    method extract( --> Seq:D) {
+        gather take self!extract-one while self;
     }
 
     # Insert values into a heap
@@ -384,17 +384,6 @@ Defined as:
 
 Returns a clone of the heap.
 
-=head2 method consume
-
-Defined as:
-
-    method consume( --> Seq:D)
-
-Returns a C<Seq> that generates values by removing them from the top of the
-heap. If no values are inserted into the heap before the C<Seq> is exhausted,
-the values will be in ascending order if called on a I<min-heap>, in descending
-order if called on a I<max-heap>.
-
 =head2 method elems
 
 Defined as:
@@ -402,6 +391,17 @@ Defined as:
     multi method elems(::?CLASS:D:)
 
 Returns the number of values on the heap. 
+
+=head2 method extract
+
+Defined as:
+
+    method extract( --> Seq:D)
+
+Returns a C<Seq> that generates values by popping them from the heap. If no
+values are pushed onto the heap before the C<Seq> is exhausted, the values will
+be in ascending order if called on a I<min-heap>, in descending order if called
+on a I<max-heap>.
 
 =head2 method gist
 

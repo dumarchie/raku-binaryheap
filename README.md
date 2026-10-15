@@ -123,15 +123,6 @@ Defined as:
 
 Returns a clone of the heap.
 
-method consume
---------------
-
-Defined as:
-
-    method consume( --> Seq:D)
-
-Returns a `Seq` that generates values by removing them from the top of the heap. If no values are inserted into the heap before the `Seq` is exhausted, the values will be in ascending order if called on a *min-heap*, in descending order if called on a *max-heap*.
-
 method elems
 ------------
 
@@ -140,6 +131,15 @@ Defined as:
     multi method elems(::?CLASS:D:)
 
 Returns the number of values on the heap. 
+
+method extract
+--------------
+
+Defined as:
+
+    method extract( --> Seq:D)
+
+Returns a `Seq` that generates values by popping them from the heap. If no values are pushed onto the heap before the `Seq` is exhausted, the values will be in ascending order if called on a *min-heap*, in descending order if called on a *max-heap*.
 
 method gist
 -----------

@@ -21,12 +21,12 @@ my @values = 'foo' => 1, 'bar'=> 2, 'foobar' => 3, 'baz' => 4;
 
 {
     my $heap = max-heap(*.value <=> *.value, @values);
-    cmp-ok $heap.consume, 'eqv', @values.sort({$^b.value <=> $^a.value}),
+    cmp-ok $heap.extract, 'eqv', @values.sort({$^b.value <=> $^a.value}),
       'max-heap(*.value <=> *.value, @values)';
 }
 
 {
     my $heap = min-heap(*.value <=> *.value, @values);
-    cmp-ok $heap.consume, 'eqv', @values.sort({$^a.value <=> $^b.value}),
+    cmp-ok $heap.extract, 'eqv', @values.sort({$^a.value <=> $^b.value}),
       'min-heap(*.value <=> *.value, @values)';
 }

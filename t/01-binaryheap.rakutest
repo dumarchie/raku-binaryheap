@@ -120,10 +120,10 @@ subtest 'pop a value from a heap', {
     };
 };
 
-subtest 'consume values on a heap', {
+subtest 'extract values from a heap', {
     my $heap = MinHeap.new(25, 17, 7, 2, 19, 36, 3, 1, 100);
-    my \got = $heap.consume;
-    isa-ok got, Seq, '.consume returns a Seq';
+    my \got = $heap.extract;
+    isa-ok got, Seq, '.extract returns a Seq';
     heap-ok $heap, (1, 2, 3, 17, 19, 36, 7, 25, 100),
       'the Seq does not modify the heap';
 

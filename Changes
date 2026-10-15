@@ -4,6 +4,7 @@
     - Remove default &infix:<precedes> from GenHeap
     - Support .new(@values, :in-place) and remove method .heapify
     - Remove method .sort
+    - Rename method .consume to .extract 
 1.0.0 2026-10-10
     - Add optional exports, including a GenHeap role alias
     - Improve performance of the .push method
