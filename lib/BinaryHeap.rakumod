@@ -176,16 +176,13 @@ role GenHeap[&infix:<precedes>] is export {
         }
     }
 
-    proto method sort(|) {*}
-    multi method sort(::?CLASS:U:) { Array.new }
-    multi method sort(::?CLASS:D:) {
-        my @array := @!array;
+    # The actual heapsort implementation
+    method extract-reverse is implementation-detail {
         while $!elems > 1 {
-            my $node := @array[--$!elems];
+            my $node := @!array[--$!elems];
             $node = self.replace($node);
         }
-        self!SET-SELF(@array.new);
-        @array;
+        @!array;
     }
 
     multi method Bool(::?CLASS:D: --> Bool:D) { $!elems > 0 }
@@ -225,11 +222,11 @@ multi sub infix:<eqv>(GenHeap \a, GenHeap \b --> Bool:D) is export(:MANDATORY) {
 our proto heapsort(|) is export {*}
 multi sub heapsort(@array, Bool() :$reverse) {
     my \Heap = $reverse ?? MinHeap !! MaxHeap;
-    Heap.new(@array, :in-place).sort;
+    Heap.new(@array, :in-place).extract-reverse;
 }
 multi sub heapsort(&cmp, @array, Bool() :$reverse) {
     my &make-heap := $reverse ?? &min-heap !! &max-heap;
-    make-heap(&cmp, @array, :in-place).sort;
+    make-heap(&cmp, @array, :in-place).extract-reverse;
 }
 
 # Dynamic heap factories
@@ -490,17 +487,6 @@ Functionally equivalent, but more efficient than a L<pop|#method_pop> followed
 by a L<push|#method_push>. Removes the L<top|#method_top> of the heap and
 returns it after inserting the new value.
 
-=head2 method sort
-
-Defined as:
-
-    method sort()
-
-Returns an empty C<Array> if called on an uninitialized heap. Otherwise sorts
-the underlying array in descending order if called on a I<min-heap>, in
-ascending order if called on a I<max-heap>. Replaces the underlying array with
-an empty copy and returns the sorted array.
-
 =head2 method top
 
 Defined as:
@@ -524,8 +510,7 @@ the heap.
 
 =item L<Heapsort - Wikipedia|https://en.wikipedia.org/wiki/Heapsort>
 
-=item L<Raku's built-in C<sort> routine|https://docs.raku.org/routine/sort>,
-which is faster than a L<C<heapsort>|#sub_heapsort> on Rakudo.
+=item L<Raku's built-in C<sort> routine|https://docs.raku.org/routine/sort>
 
 =head1 AUTHOR
 

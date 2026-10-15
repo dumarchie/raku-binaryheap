@@ -10,5 +10,5 @@ benchmark/heap-*
 benchmark/sort.raku
 benchmark/*.log
 
-# profiles
-profile-*.html
+# distribution archives
+BinaryHeap-*.tar.gz

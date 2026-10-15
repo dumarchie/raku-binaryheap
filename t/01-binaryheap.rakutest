@@ -1,5 +1,5 @@
 use Test;
-plan 10;
+plan 9;
 
 use BinaryHeap <MinHeap>;
 
@@ -16,7 +16,6 @@ subtest 'uninitialized heap', {
     is MinHeap.of, Mu, '.of';
     is MinHeap.top, Nil, '.top';
     heap-ok MinHeap, Empty;
-    is-deeply MinHeap.sort, [], '.sort returns an empty array';
 }
 
 subtest 'create a heap', {
@@ -197,14 +196,4 @@ subtest 'heapify', {
 
     my $heap2 = $heap.clone;
     is $heap2.of, int, '.clone maintains the type constraint of the heap';
-}
-
-subtest 'sort the values on a heap', {
-    my int @array = 25, 17, 36, 2, 19, 7, 3, 1, 100;
-    my $heap = MinHeap.new(@array);
-
-    my \got = $heap.sort;
-    my \expected = @array.sort.reverse;
-    is-deeply got, expected,
-      '.sort returns the underlying array with values in descending order';
 }

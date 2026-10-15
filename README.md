@@ -218,15 +218,6 @@ Defined as:
 
 Functionally equivalent, but more efficient than a [pop](#method_pop) followed by a [push](#method_push). Removes the [top](#method_top) of the heap and returns it after inserting the new value.
 
-method sort
------------
-
-Defined as:
-
-    method sort()
-
-Returns an empty `Array` if called on an uninitialized heap. Otherwise sorts the underlying array in descending order if called on a *min-heap*, in ascending order if called on a *max-heap*. Replaces the underlying array with an empty copy and returns the sorted array.
-
 method top
 ----------
 
@@ -252,7 +243,7 @@ SEE ALSO
 
   * [Heapsort - Wikipedia](https://en.wikipedia.org/wiki/Heapsort)
 
-  * [Raku's built-in `sort` routine](https://docs.raku.org/routine/sort), which is faster than a [`heapsort`](#sub_heapsort) on Rakudo.
+  * [Raku's built-in `sort` routine](https://docs.raku.org/routine/sort)
 
 AUTHOR
 ======
