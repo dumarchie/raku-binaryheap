@@ -267,12 +267,13 @@ BinaryHeap - Array-based binary heap supporting heapsort
 Module C<BinaryHeap> implements a heap data structure and an (in-place)
 C<heapsort> routine. The heap data structure is implemented by role C<GenHeap>,
 which stores values in an implicit binary tree that satisfies the B<heap
-property>: the value of a node never I<precedes> the value of its parent node.
+property>: the priority of a node never I<precedes> the priority of its parent.
 
 Module C<BinaryHeap> provides two classes that do the C<GenHeap> role using
-Raku's built-in three-way comparison operator: C<MaxHeap> and C<MinHeap>. It
-also provides C<max-heap> and C<min-heap> factory routines that accept a custom
-comparator, compose a class and return an instance of that class.
+Raku's built-in three-way comparison operator: C<MaxHeap> and C<MinHeap>. These
+heaps do not distinguish between a heap element and its priority. The dynamic
+C<max-heap> and C<min-heap> factories accept a custom comparator that may
+define an element's priority differently.
 
 In many cases, an uninitialized heap can be manipulated as if it were an empty
 object instance. Methods that add values autovivify the heap, which means they
@@ -296,20 +297,22 @@ only, provide a list of symbol names to `use`.
     role GenHeap[&infix:<precedes>] {
 
 Implements the heap data structure. Infix C<precedes> defines the heap
-invariant: no child node has a value that precedes the value of its parent. See
-below implementations of C<MaxHeap> and C<MinHeap> for examples.
+invariant: no child node has a priority that precedes the priority of its
+parent. See the implementations of C<MaxHeap> and C<MinHeap> for examples.
 
 =head2 class MaxHeap
 
     class MaxHeap does GenHeap[* cmp * == More] {}
 
-A I<max-heap> that uses Raku's built-in C<infix:<cmp>>.
+A I<max-heap> that uses Raku's built-in C<infix:<cmp>> to compare the priority
+of elements.
 
 =head2 class MinHeap
 
     class MinHeap does GenHeap[* cmp * == Less] {}
 
-A I<min-heap> that uses Raku's built-in C<infix:<cmp>>.
+A I<min-heap> that uses Raku's built-in C<infix:<cmp>> to compare the priority
+of elements.
 
 =head2 infix eqv
 
@@ -318,7 +321,7 @@ Defined as:
     multi sub infix:<eqv>(GenHeap:D \a, GenHeap:D \b --> Bool:D)
 
 Returns C<True> if and only if the two heaps are of the same type and contain
-equivalent L<values|#method_values>.
+equivalent elements at each position.
 
 =head2 sub heapsort
 
@@ -328,12 +331,12 @@ Defined as:
     multi sub heapsort(@values, Bool() :$reverse)
     multi sub heapsort(&comparator, @values, Bool() :$reverse)
 
-Sorts the values in-place and returns the array if C<@values> is an array;
-otherwise sorts and returns a new C<Array>. Values are sorted using the provided
-three-way C<&comparator> or Raku's built-in C<&infix:<cmp>>. 
+Sorts the elements in-place and returns the array if C<@values> is an array;
+otherwise sorts and returns the elements of a new C<Array>. Values are sorted
+using the provided three-way C<&comparator> or Raku's built-in C<&infix:<cmp>>.
 
 To sort in descending order, use the C<:reverse> adverb or negate the result of
-C<&comparator>. For example, the following statements both put the values in
+C<&comparator>. For example, the following statements both return values in
 descending order:
 
     heapsort @values, :reverse;
@@ -374,7 +377,7 @@ Defined as:
 
     multi method Bool(::?CLASS:D: --> Bool:D)
 
-Returns C<True> if the heap contains at least one value, and C<False> if the
+Returns C<True> if the heap contains at least one element, and C<False> if the
 heap is empty.
 
 =head2 method clone
@@ -391,7 +394,7 @@ Defined as:
 
     multi method elems(::?CLASS:D:)
 
-Returns the number of values on the heap. 
+Returns the number of elements in the heap. 
 
 =head2 method extract
 
@@ -399,10 +402,10 @@ Defined as:
 
     method extract( --> Seq:D)
 
-Returns a C<Seq> that generates values by popping them from the heap. If no
-values are pushed onto the heap before the C<Seq> is exhausted, the values will
-be in ascending order if called on a I<min-heap>, in descending order if called
-on a I<max-heap>.
+Returns a C<Seq> that generates values by popping elements from the heap. If no
+values are pushed onto the heap before the C<Seq> is exhausted, the sequence
+will be in non-decreasing order if called on a I<min-heap>, and in
+non-increasing order if called on a I<max-heap>.
 
 =head2 method gist
 
@@ -421,7 +424,7 @@ Defined as:
 Constructs a new heap containing the provided values. If C<values> is a single,
 non-itemized array, the C<:in-place> adverb causes the array to be heapified in
 place. By default, an array is cloned before heapification. In either case, the
-array's type constraint applies to all values in the heap.
+array's type constraint applies to all elements in the heap.
 
 =head2 method of
 
@@ -429,7 +432,7 @@ Defined as:
 
     method of()
 
-Returns the type constraint for the values on the heap. Returns C<Mu> by
+Returns the type constraint for the elements in the heap. Returns C<Mu> by
 default, but a heap can be constrained to a specific element type by calling
 C<.new> with a type-constrained array.
 
@@ -439,8 +442,8 @@ Defined as:
 
     method pop()
 
-Removes the value stored at the L<top|#method_top> of the heap and returns it,
-or returns a C<Failure> if the heap is empty.
+Removes the element at the top of the heap and returns it, or returns a
+C<Failure> if the heap is empty.
 
 =head2 method push
 
@@ -449,13 +452,8 @@ Defined as:
     method push(**@values --> ::?CLASS:D)
 
 Inserts the provided values into the heap and returns the modified heap.
-Autovivifies the invocant if called on a container storing or defaulting to a
-class type object. For example:
-
-    my BinaryHeap::MaxHeap $heap;
-    $heap.push(42, 11);
-    say $heap.pop; # OUTPUT: «42␤»
-    say $heap.top; # OUTPUT: «11␤»
+Autovivifies the invocant if called on a container that stores or is
+constrained to a C<GenHeap> class.
 
 =head2 method push-pop
 
@@ -463,10 +461,9 @@ Defined as:
 
     method push-pop(Mu \value)
 
-Functionally equivalent, but more efficient than a L<push|#method_push>
-followed by a L<pop|#method_pop>. L<Replaces the top|#method_replace> of the
-heap if it C<precedes> the provided value; otherwise just returns the provided
-value.
+Functionally equivalent to, but more efficient than C<.push(value)> followed by
+C<.pop>. Replaces the top of the heap if its priority precedes that of the
+provided value; otherwise returns the C<value> self.
 
 =head2 method raku
 
@@ -484,9 +481,9 @@ Defined as:
 
     method replace(Mu \new)
 
-Functionally equivalent, but more efficient than a L<pop|#method_pop> followed
-by a L<push|#method_push>. Removes the L<top|#method_top> of the heap and
-returns it after inserting the new value.
+Functionally equivalent to, but more efficient than C<.pop> followed by
+C<.push(new)>. Replaces the element at the top of the heap with the C<new> value
+and returns the old value.
 
 =head2 method top
 
@@ -494,7 +491,8 @@ Defined as:
 
     method top()
 
-Returns the value stored at the top of the heap, or C<Nil> if the heap is empty.
+Returns the element stored at the top of the heap, or C<Nil> if the heap is
+empty.
 
 =head2 method values
 
@@ -502,7 +500,7 @@ Defined as:
 
     method values( --> Seq:D)
 
-Returns a C<Seq> of the values encountered during a breadth-first traversal of
+Returns a C<Seq> of the elements encountered during a breadth-first traversal of
 the heap.
 
 =head1 SEE ALSO

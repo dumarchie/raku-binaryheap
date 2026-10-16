@@ -16,9 +16,9 @@ SYNOPSIS
 DESCRIPTION
 ===========
 
-Module `BinaryHeap` implements a heap data structure and an (in-place) `heapsort` routine. The heap data structure is implemented by role `GenHeap`, which stores values in an implicit binary tree that satisfies the **heap property**: the value of a node never *precedes* the value of its parent node.
+Module `BinaryHeap` implements a heap data structure and an (in-place) `heapsort` routine. The heap data structure is implemented by role `GenHeap`, which stores values in an implicit binary tree that satisfies the **heap property**: the priority of a node never *precedes* the priority of its parent.
 
-Module `BinaryHeap` provides two classes that do the `GenHeap` role using Raku's built-in three-way comparison operator: `MaxHeap` and `MinHeap`. It also provides `max-heap` and `min-heap` factory routines that accept a custom comparator, compose a class and return an instance of that class.
+Module `BinaryHeap` provides two classes that do the `GenHeap` role using Raku's built-in three-way comparison operator: `MaxHeap` and `MinHeap`. These heaps do not distinguish between a heap element and its priority. The dynamic `max-heap` and `min-heap` factories accept a custom comparator that may define an element's priority differently.
 
 In many cases, an uninitialized heap can be manipulated as if it were an empty object instance. Methods that add values autovivify the heap, which means they can only be called on a *container*. For example:
 
@@ -39,21 +39,21 @@ role GenHeap
 
     role GenHeap[&infix:<precedes>] {
 
-Implements the heap data structure. Infix `precedes` defines the heap invariant: no child node has a value that precedes the value of its parent. See below implementations of `MaxHeap` and `MinHeap` for examples.
+Implements the heap data structure. Infix `precedes` defines the heap invariant: no child node has a priority that precedes the priority of its parent. See the implementations of `MaxHeap` and `MinHeap` for examples.
 
 class MaxHeap
 -------------
 
     class MaxHeap does GenHeap[* cmp * == More] {}
 
-A *max-heap* that uses Raku's built-in `infix:<cmp>`.
+A *max-heap* that uses Raku's built-in `infix:<cmp>` to compare the priority of elements.
 
 class MinHeap
 -------------
 
     class MinHeap does GenHeap[* cmp * == Less] {}
 
-A *min-heap* that uses Raku's built-in `infix:<cmp>`.
+A *min-heap* that uses Raku's built-in `infix:<cmp>` to compare the priority of elements.
 
 infix eqv
 ---------
@@ -62,7 +62,7 @@ Defined as:
 
     multi sub infix:<eqv>(GenHeap:D \a, GenHeap:D \b --> Bool:D)
 
-Returns `True` if and only if the two heaps are of the same type and contain equivalent [values](#method_values).
+Returns `True` if and only if the two heaps are of the same type and contain equivalent elements at each position.
 
 sub heapsort
 ------------
@@ -73,9 +73,9 @@ Defined as:
     multi sub heapsort(@values, Bool() :$reverse)
     multi sub heapsort(&comparator, @values, Bool() :$reverse)
 
-Sorts the values in-place and returns the array if `@values` is an array; otherwise sorts and returns a new `Array`. Values are sorted using the provided three-way `&comparator` or Raku's built-in `&infix:<cmp>`. 
+Sorts the elements in-place and returns the array if `@values` is an array; otherwise sorts and returns the elements of a new `Array`. Values are sorted using the provided three-way `&comparator` or Raku's built-in `&infix:<cmp>`.
 
-To sort in descending order, use the `:reverse` adverb or negate the result of `&comparator`. For example, the following statements both put the values in descending order:
+To sort in descending order, use the `:reverse` adverb or negate the result of `&comparator`. For example, the following statements both return values in descending order:
 
     heapsort @values, :reverse;
     heapsort -(* cmp *), @values;
@@ -112,7 +112,7 @@ Defined as:
 
     multi method Bool(::?CLASS:D: --> Bool:D)
 
-Returns `True` if the heap contains at least one value, and `False` if the heap is empty.
+Returns `True` if the heap contains at least one element, and `False` if the heap is empty.
 
 method clone
 ------------
@@ -130,7 +130,7 @@ Defined as:
 
     multi method elems(::?CLASS:D:)
 
-Returns the number of values on the heap. 
+Returns the number of elements in the heap. 
 
 method extract
 --------------
@@ -139,7 +139,7 @@ Defined as:
 
     method extract( --> Seq:D)
 
-Returns a `Seq` that generates values by popping them from the heap. If no values are pushed onto the heap before the `Seq` is exhausted, the values will be in ascending order if called on a *min-heap*, in descending order if called on a *max-heap*.
+Returns a `Seq` that generates values by popping elements from the heap. If no values are pushed onto the heap before the `Seq` is exhausted, the sequence will be in non-decreasing order if called on a *min-heap*, and in non-increasing order if called on a *max-heap*.
 
 method gist
 -----------
@@ -157,7 +157,7 @@ Defined as:
 
     method new(+values, Bool() :$in-place --> ::?CLASS:D)
 
-Constructs a new heap containing the provided values. If `values` is a single, non-itemized array, the `:in-place` adverb causes the array to be heapified in place. By default, an array is cloned before heapification. In either case, the array's type constraint applies to all values in the heap.
+Constructs a new heap containing the provided values. If `values` is a single, non-itemized array, the `:in-place` adverb causes the array to be heapified in place. By default, an array is cloned before heapification. In either case, the array's type constraint applies to all elements in the heap.
 
 method of
 ---------
@@ -166,7 +166,7 @@ Defined as:
 
     method of()
 
-Returns the type constraint for the values on the heap. Returns `Mu` by default, but a heap can be constrained to a specific element type by calling `.new` with a type-constrained array.
+Returns the type constraint for the elements in the heap. Returns `Mu` by default, but a heap can be constrained to a specific element type by calling `.new` with a type-constrained array.
 
 method pop
 ----------
@@ -175,7 +175,7 @@ Defined as:
 
     method pop()
 
-Removes the value stored at the [top](#method_top) of the heap and returns it, or returns a `Failure` if the heap is empty.
+Removes the element at the top of the heap and returns it, or returns a `Failure` if the heap is empty.
 
 method push
 -----------
@@ -184,12 +184,7 @@ Defined as:
 
     method push(**@values --> ::?CLASS:D)
 
-Inserts the provided values into the heap and returns the modified heap. Autovivifies the invocant if called on a container storing or defaulting to a class type object. For example:
-
-    my BinaryHeap::MaxHeap $heap;
-    $heap.push(42, 11);
-    say $heap.pop; # OUTPUT: «42␤»
-    say $heap.top; # OUTPUT: «11␤»
+Inserts the provided values into the heap and returns the modified heap. Autovivifies the invocant if called on a container that stores or is constrained to a `GenHeap` class.
 
 method push-pop
 ---------------
@@ -198,7 +193,7 @@ Defined as:
 
     method push-pop(Mu \value)
 
-Functionally equivalent, but more efficient than a [push](#method_push) followed by a [pop](#method_pop). [Replaces the top](#method_replace) of the heap if it `precedes` the provided value; otherwise just returns the provided value.
+Functionally equivalent to, but more efficient than `.push(value)` followed by `.pop`. Replaces the top of the heap if its priority precedes that of the provided value; otherwise returns the `value` self.
 
 method raku
 -----------
@@ -216,7 +211,7 @@ Defined as:
 
     method replace(Mu \new)
 
-Functionally equivalent, but more efficient than a [pop](#method_pop) followed by a [push](#method_push). Removes the [top](#method_top) of the heap and returns it after inserting the new value.
+Functionally equivalent to, but more efficient than `.pop` followed by `.push(new)`. Replaces the element at the top of the heap with the `new` value and returns the old value.
 
 method top
 ----------
@@ -225,7 +220,7 @@ Defined as:
 
     method top()
 
-Returns the value stored at the top of the heap, or `Nil` if the heap is empty.
+Returns the element stored at the top of the heap, or `Nil` if the heap is empty.
 
 method values
 -------------
@@ -234,7 +229,7 @@ Defined as:
 
     method values( --> Seq:D)
 
-Returns a `Seq` of the values encountered during a breadth-first traversal of the heap.
+Returns a `Seq` of the elements encountered during a breadth-first traversal of the heap.
 
 SEE ALSO
 ========
