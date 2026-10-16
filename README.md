@@ -137,9 +137,9 @@ method extract
 
 Defined as:
 
-    method extract( --> Seq:D)
+    method extract(\n? --> Seq:D)
 
-Returns a `Seq` that generates values by popping elements from the heap. If no values are pushed onto the heap before the `Seq` is exhausted, the sequence will be in non-decreasing order if called on a *min-heap*, and in non-increasing order if called on a *max-heap*.
+Returns a `Seq` that generates values by popping elements from the heap until `n` elements were extracted or the heap is empty. If no values are pushed onto the heap before the `Seq` is exhausted, the sequence will be in non-decreasing order if called on a *min-heap*, and in non-increasing order if called on a *max-heap*.
 
 method gist
 -----------
