@@ -113,7 +113,7 @@ role GenHeap[&infix:<precedes>] is export {
           X::Cannot::Empty.new(:action<pop>, :what(self.^name));
     }
     method !extract-one() {
-        my $value = @!array[$!elems - 1]:delete;
+        my $value = @!array[$!elems - 1];
         --$!elems > 0 ?? self.replace($value) !! $value;
     }
 
