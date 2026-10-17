@@ -113,8 +113,8 @@ role GenHeap[&infix:<precedes>] is export {
           X::Cannot::Empty.new(:action<pop>, :what(self.^name));
     }
     method !extract-one() {
-        my $value = @!array[$!elems - 1];
-        --$!elems > 0 ?? self.replace($value) !! $value;
+        my $value = @!array[--$!elems];
+        $!elems ?? self!replace-top($value) !! $value;
     }
 
     # Extract a Seq of values from a heap
@@ -169,16 +169,19 @@ role GenHeap[&infix:<precedes>] is export {
     # Replace the top of a heap (extract, then insert)
     method replace(\SELF: Mu \new) {
         if self {
-            my $node := @!array[0];
-            my $old = $node;
-            $node = new;
-            self!sift-down(0);
-            $old;
+            self!replace-top(new);
         }
         else {
             SELF.push(new);
             Nil;
         }
+    }
+    method !replace-top(Mu \new) {
+        my $node := @!array[0];
+        my $value = $node;
+        $node = new;
+        self!sift-down(0);
+        $value;
     }
 
     # The actual heapsort implementation
