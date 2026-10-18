@@ -86,7 +86,7 @@ role GenHeap[&infix:<tops>] is export {
     multi method new(Iterable \value, Bool() :$in-place) {
         my @values;
         if value.VAR !=== value {
-            @values = value;
+            @values := Array.new(value);
         }
         elsif value ~~ Array|array {
             @values := $in-place ?? value !! value.clone;
