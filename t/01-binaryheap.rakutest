@@ -4,7 +4,7 @@ plan 9;
 use BinaryHeap <MinHeap MaxHeap>;
 
 sub heap-ok(\heap, \values, $desc?) {
-    cmp-ok heap.values, 'eqv', values.Seq, $desc // '.values';
+    is-deeply heap.values, values.Seq, $desc // '.values';
     is heap.elems, values.elems, '.elems';
 }
 
