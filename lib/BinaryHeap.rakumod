@@ -79,11 +79,11 @@ role GenHeap[&infix:<tops>] is export {
 
     # Construct a heap with zero or more values
     proto method new(| --> ::?CLASS:D) {*}
-    multi method new() { self.CREATE }
-    multi method new(**@values) {
-        self.CREATE!SET-SELF(@values);
+    multi method new(::?CLASS:) { ::?CLASS.CREATE }
+    multi method new(::?CLASS: **@values) {
+        ::?CLASS.CREATE!SET-SELF(@values);
     }
-    multi method new(Iterable \value, Bool() :$in-place) {
+    multi method new(::?CLASS: Iterable \value, Bool() :$in-place) {
         my @values;
         if value.VAR !=== value {
             @values := Array.new(value);
@@ -94,7 +94,7 @@ role GenHeap[&infix:<tops>] is export {
         else {
             @values := value.Array;
         }
-        self.CREATE!SET-SELF(@values);
+        ::?CLASS.CREATE!SET-SELF(@values);
     }
 
     # A heap has the type constraint of the underlying array
@@ -104,7 +104,7 @@ role GenHeap[&infix:<tops>] is export {
 
     # A clone should retain a constraint on element type
     multi method clone(::?CLASS:D:) {
-        self.CREATE!SET-SELF(@!array.clone, $!elems);
+        ::?CLASS.CREATE!SET-SELF(@!array.clone, $!elems);
     }
 
     # Extract a single value from a heap
