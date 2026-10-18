@@ -16,7 +16,7 @@ SYNOPSIS
 DESCRIPTION
 ===========
 
-Module `BinaryHeap` implements a heap data structure and an (in-place) `heapsort` routine. The heap data structure is implemented by role `GenHeap`, which stores values in an implicit binary tree that satisfies the **heap property**: the priority of a node never *precedes* the priority of its parent.
+Module `BinaryHeap` implements a heap data structure and an (in-place) `heapsort` routine. The heap data structure is implemented by role `GenHeap`, which stores values in an implicit binary tree that satisfies the **heap property**: the priority of a node never *tops* the priority of its parent. The priority of the element at the top of a heap is greater than or equal to the priority of all other elements in a *max-heap*, and less than or equal to the priority of all other elements in a *min-heap*.
 
 Module `BinaryHeap` provides two classes that do the `GenHeap` role using Raku's built-in three-way comparison operator: `MaxHeap` and `MinHeap`. These heaps do not distinguish between a heap element and its priority. The dynamic `max-heap` and `min-heap` factories accept a custom comparator that may define an element's priority differently.
 
@@ -37,9 +37,9 @@ Apart from the mandatory `&infix:<eqv>` candidate, the following symbols in the 
 role GenHeap
 ------------
 
-    role GenHeap[&infix:<precedes>] {
+    role GenHeap[&infix:<tops>] {
 
-Implements the heap data structure. Infix `precedes` defines the heap invariant: no child node has a priority that precedes the priority of its parent. See the implementations of `MaxHeap` and `MinHeap` for examples.
+Implements the heap data structure. Infix `tops` defines the heap invariant: no child node has a priority that tops the priority of its parent. See the implementations of `MaxHeap` and `MinHeap` for examples.
 
 class MaxHeap
 -------------
@@ -194,7 +194,7 @@ Defined as:
 
     method push-pop(Mu \value)
 
-Functionally equivalent to, but more efficient than `.push(value)` followed by `.pop`. Replaces the top of the heap if its priority precedes that of the provided value; otherwise returns the `value` self.
+Functionally equivalent to, but more efficient than `.push(value)` followed by `.pop`. Replaces the top of the heap if its priority tops that of the provided value; otherwise returns the `value` self.
 
 method raku
 -----------

@@ -12,10 +12,10 @@ sub EXPORT(**@keys) {
 unit module BinaryHeap;
 
 # A heap is a binary tree that satisfies the heap invariant:
-# the value of a node never precedes the value of its parent node
-proto sub infix:<precedes>($, $) {*}
+# the priority of a node never tops the priority of its parent node
+proto sub infix:<tops>($, $) {*}
 
-role GenHeap[&infix:<precedes>] is export {
+role GenHeap[&infix:<tops>] is export {
     # The heap is represented by @!array[^$!elems];
     # the array may contain additional elements to accommodate a heapsort.
     has @!array;
@@ -45,7 +45,7 @@ role GenHeap[&infix:<precedes>] is export {
         while ($pos = ($pos * 2) + 1) < $heap-end {
             my \left  = @!array[$pos];
             my \right = @!array[$pos + 1];
-            if left precedes right {
+            if left tops right {
                 @!path.BIND-POS(++$path-end, left);
             }
             else {
@@ -61,7 +61,7 @@ role GenHeap[&infix:<precedes>] is export {
 
         # shorten the path until the final node can hold the value of the first
         my $value = $node;
-        while $path-end > 0 && $value precedes @!path[$path-end] {
+        while $path-end > 0 && $value tops @!path[$path-end] {
             $path-end--;
         }
 
@@ -153,7 +153,7 @@ role GenHeap[&infix:<precedes>] is export {
 
         # sift the provided value up from the new node
         while $pos > 0
-          && value precedes my \parent = @!array[$pos = ($pos - 1) div 2]
+          && value tops my \parent = @!array[$pos = ($pos - 1) div 2]
         {
             $node  = parent;
             $node := parent;
@@ -163,7 +163,7 @@ role GenHeap[&infix:<precedes>] is export {
 
     # Insert, then extract
     method push-pop(Mu \value) {
-        self && @!array[0] precedes value ?? self.replace(value) !! value;
+        self && @!array[0] tops value ?? self.replace(value) !! value;
     }
 
     # Replace the top of a heap (extract, then insert)
@@ -276,7 +276,10 @@ BinaryHeap - Array-based binary heap supporting heapsort
 Module C<BinaryHeap> implements a heap data structure and an (in-place)
 C<heapsort> routine. The heap data structure is implemented by role C<GenHeap>,
 which stores values in an implicit binary tree that satisfies the B<heap
-property>: the priority of a node never I<precedes> the priority of its parent.
+property>: the priority of a node never I<tops> the priority of its parent. The
+priority of the element at the top of a heap is greater than or equal to the
+priority of all other elements in a I<max-heap>, and less than or equal to the
+priority of all other elements in a I<min-heap>.
 
 Module C<BinaryHeap> provides two classes that do the C<GenHeap> role using
 Raku's built-in three-way comparison operator: C<MaxHeap> and C<MinHeap>. These
@@ -303,11 +306,11 @@ only, provide a list of symbol names to `use`.
 
 =head2 role GenHeap
 
-    role GenHeap[&infix:<precedes>] {
+    role GenHeap[&infix:<tops>] {
 
-Implements the heap data structure. Infix C<precedes> defines the heap
-invariant: no child node has a priority that precedes the priority of its
-parent. See the implementations of C<MaxHeap> and C<MinHeap> for examples.
+Implements the heap data structure. Infix C<tops> defines the heap invariant:
+no child node has a priority that tops the priority of its parent. See the
+implementations of C<MaxHeap> and C<MinHeap> for examples.
 
 =head2 class MaxHeap
 
@@ -473,8 +476,8 @@ Defined as:
     method push-pop(Mu \value)
 
 Functionally equivalent to, but more efficient than C<.push(value)> followed by
-C<.pop>. Replaces the top of the heap if its priority precedes that of the
-provided value; otherwise returns the C<value> self.
+C<.pop>. Replaces the top of the heap if its priority tops that of the provided
+value; otherwise returns the C<value> self.
 
 =head2 method raku
 
