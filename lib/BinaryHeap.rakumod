@@ -110,7 +110,7 @@ role GenHeap[&infix:<precedes>] is export {
     # Extract a single value from a heap
     method pop() {
         self ?? self!extract-one !! Failure.new:
-          X::Cannot::Empty.new(:action<pop>, :what(self.WHAT.raku));
+          X::Cannot::Empty.new(:action<pop>, :what(self.^name));
     }
     method !extract-one() {
         my $value = @!array[--$!elems];
@@ -213,7 +213,7 @@ role GenHeap[&infix:<precedes>] is export {
 
     # Representation for core infix eqv
     multi method raku(::?CLASS:D:) {
-        my $cons = "{self.WHAT.raku}.new";
+        my $cons = "{self.^name}.new";
         $!elems ?? $cons ~ @!array[^$!elems].raku !! $cons;
     }
 }
