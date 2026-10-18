@@ -4,18 +4,21 @@ plan 9;
 use BinaryHeap <MinHeap MaxHeap>;
 
 sub heap-ok(\heap, \values, $desc?) {
-    unless $desc {
-        my \expected = heap.defined ?? values.elems !! 1;
-        is heap.elems, expected, '.elems';
-    }
     cmp-ok heap.values, 'eqv', values.Seq, $desc // '.values';
+    is heap.elems, values.elems, '.elems';
 }
 
-subtest 'uninitialized heap', {
-    is MinHeap.Bool, False, '.Bool';
-    is MinHeap.of, Mu, '.of';
-    is MinHeap.top, Nil, '.top';
-    heap-ok MinHeap, Empty;
+subtest 'uninitialized $heap', {
+    my MinHeap $heap;
+    is $heap.Bool, False, '$heap.Bool';
+    is $heap.of, Mu, '$heap.of';
+    is $heap.top, Nil, '$heap.top';
+    is-deeply $heap.values, (), '$heap.values';
+    cmp-ok $heap, 'eqv', MinHeap, '$heap has not been autovivified';
+
+    # .elems should autovivify
+    is $heap.elems, 0, '$heap.elems';
+    cmp-ok $heap, 'eqv', MinHeap.new, '$heap has been autovivified';
 }
 
 subtest 'create a heap', {

@@ -129,9 +129,9 @@ role GenHeap[&infix:<precedes>] is export {
 
     # Insert values into a heap
     proto method push(| --> ::?CLASS:D) {*}
-    multi method push(::?ROLE:U $_ is rw: **@values is raw) {
+    multi method push(::?ROLE:U $self is rw: **@values is raw) {
         # Note: this may yield a different heap structure than .new
-        $_ = self.CREATE.push(|@values);
+        $self = self.CREATE.push(|@values);
     }
     multi method push(::?ROLE:D: **@values is raw) {
         self!insert($_) for @values;
@@ -197,6 +197,7 @@ role GenHeap[&infix:<precedes>] is export {
     method top() { self ?? @!array[0] !! Nil }
 
     # Expose number of values on the heap
+    multi method elems(::?CLASS:U $self is rw: --> 0) { $self = self.new }
     multi method elems(::?CLASS:D:) { $!elems }
 
     # Allow introspection, but do not return containers:
@@ -400,9 +401,11 @@ Returns a clone of the heap.
 
 Defined as:
 
+    multi method elems(::?CLASS:U $self is rw: --> 0)
     multi method elems(::?CLASS:D:)
 
-Returns the number of elements in the heap. 
+Returns the number of elements in the heap. Autovivifies because Rakudo defines
+the number of elements in a type object as 1.
 
 =head2 method extract
 
@@ -461,8 +464,7 @@ Defined as:
     method push(**@values --> ::?CLASS:D)
 
 Inserts the provided values into the heap and returns the modified heap.
-Autovivifies the invocant if called on a container that stores or is
-constrained to a C<GenHeap> class.
+Autovivifies an uninitialized invocant.
 
 =head2 method push-pop
 
