@@ -198,12 +198,12 @@ subtest 'clone', {
 }
 
 subtest 'heapify', {
-    my int @array = 25, 17, 36, 2, 19, 7, 3, 1, 100;
+    my Int @array = 25, 17, 36, 2, 19, 7, 3, 1, 100;
     my $heap = MinHeap.new(@array, :in-place);
-    is $heap.of, int,
+    is $heap.of, Int,
       '.new(@array, :in-place) constrains the type of values on the heap';
 
-    my int @heapified = 1, 2, 3, 17, 19, 7, 36, 25, 100;
+    my Int @heapified = 1, 2, 3, 17, 19, 7, 36, 25, 100;
     is-deeply @array, @heapified,
       '... and puts the elements of the provieded @array in heap order';
 
@@ -217,5 +217,5 @@ subtest 'heapify', {
     };
 
     my $heap2 = $heap.clone;
-    is $heap2.of, int, '.clone maintains the type constraint of the heap';
+    is $heap2.of, Int, '.clone maintains the type constraint of the heap';
 }

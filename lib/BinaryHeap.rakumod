@@ -177,9 +177,8 @@ role GenHeap[&infix:<tops>] is export {
         }
     }
     method !replace-top(Mu \new) {
-        my $node := @!array[0];
-        my $value = $node;
-        $node = new;
+        my $value = @!array[0];
+        @!array[0] = new;
         self!sift-down(0);
         $value;
     }
