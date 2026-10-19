@@ -1,15 +1,14 @@
 use Test;
 plan 7;
 
-use BinaryHeap <MaxHeap &heapsort>;
+use BinaryHeap <MaxHeap MinHeap &heapsort>;
 
-# Assert that &infix:<eqv> is a mandatory import
 subtest 'infix eqv', {
-    ok &infix:<eqv>.candidates.grep(
-        *.package === BinaryHeap
-    ), '&infix:<eqv> candidate is imported from package BinaryHeap';
-
-    ok MaxHeap.new !eqv MaxHeap, 'MaxHeap.new !eqv MaxHeap';
+    # Note: Raku++ does not appear to support :MANDATORY exports
+    ok MaxHeap.new(42) eqv MaxHeap.new(42),
+      'MaxHeap.new(42) eqv MaxHeap.new(42)';
+    ok MaxHeap.new(42) !eqv MinHeap.new(42),
+      'MaxHeap.new(42) !eqv MinHeap.new(42)';
 }
 
 # Assert that trying to import unexported symbols throws
@@ -44,18 +43,19 @@ subtest 'reverse heapsort', {
       'the array elements are sorted in descending order';
 }
 
+# Note: Raku++ 5.4.1 does not support -(* cmp *)
 subtest 'heapsort with custom comparator', {
     my @array = values;
-    is heapsort(-(* cmp *), @array), @array,
-      'heapsort(-(* cmp *), @array) returns the array';
+    is heapsort({$^b cmp $^a}, @array), @array,
+      'heapsort({$^b cmp $^a}, @array) returns the array';
     is-deeply @array, values.sort.reverse.Array,
       'the array elements are put in descending order';
 }
 
 subtest 'reverse heapsort with custom comparator', {
     my @array = values;
-    is heapsort(-(* cmp *), @array, :reverse), @array,
-      'heapsort(-(* cmp *), @array, :reverse) returns the array';
+    is heapsort({$^b cmp $^a}, @array, :reverse), @array,
+      'heapsort({$^b cmp $^a}, @array, :reverse) returns the array';
     is-deeply @array, values.sort.Array,
       'the array elements are put in ascending order';
 }
