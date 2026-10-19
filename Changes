@@ -1,6 +1,7 @@
 2.0.3
     - Let .elems autovivify
     - Improve documentation
+    - Make non-author tests pass on Raku++
 2.0.2 2026-10-17
     - Remove Rakudo-specific metamethod calls 
 2.0.1 2026-10-17
