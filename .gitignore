@@ -4,11 +4,7 @@ lib/.precomp
 
 # distributions
 sdist
-
-# benchmarks of alternative implementations and benchmark logs
-benchmark/heap-*
-benchmark/sort.raku
-benchmark/*.log
-
-# distribution archives
 BinaryHeap-*.tar.gz
+
+# benchmark logs
+benchmark/*.log
