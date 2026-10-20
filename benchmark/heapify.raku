@@ -2,19 +2,24 @@ use BinaryHeap <MinHeap>;
 
 constant n = 2**19;
 
-sub input(\n, \of) {
+sub input(\n, $type) {
     srand(42); # make roll reproducible
     my \seq = (^n).roll(n);
-    given of {
+    my \values = do given $type {
+        when Str:U { seq.list       }
+        when 'Mu'  { seq.Array      }
         when 'Int' { my Int @ = seq } 
         when 'int' { my int @ = seq }
-        default { seq.list }
+        die "Array must be of type Mu|Int|int; array of $type is not supported";
     }
+
+    values.elems; # reifies
+    return values;
 }
 
-sub MAIN(Int $n = n, Str :$type, Bool :$in-place) {
-    my \values = input($n, $type);
-    print "Heapify {values.^name} with {values.elems} elems: ";
+sub MAIN(Int $n = n, Str :$array-of, Bool :$in-place) {
+    my \values = input($n, $array-of);
+    print "Heapify fully reified {values.^name} with $n elems: ";
 
     my $time = now;
     my $heap = MinHeap.new(values, :$in-place);
