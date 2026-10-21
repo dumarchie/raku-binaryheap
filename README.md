@@ -228,7 +228,7 @@ method values
 
 Defined as:
 
-    method values( --> Seq:D)
+    multi method values(::?CLASS:D: --> Seq:D)
 
 Returns a `Seq` of the elements encountered during a breadth-first traversal of the heap.
 
