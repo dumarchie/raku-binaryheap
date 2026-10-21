@@ -83,10 +83,14 @@ role GenHeap[&infix:<tops>] is export {
     multi method new(::?CLASS: **@values) {
         ::?CLASS.CREATE!SET-SELF(@values);
     }
+    # Flatten an itemized Slip
+    multi method new(::?CLASS: Slip \values) {
+        self.new(values.Array, :in-place);
+    }
     multi method new(::?CLASS: Iterable \value, Bool() :$in-place) {
         my @values;
         if value.VAR !=== value {
-            @values := Array.new(value);
+            @values = value;
         }
         elsif value ~~ Array|array {
             @values := $in-place ?? value !! value.clone;

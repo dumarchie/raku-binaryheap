@@ -45,11 +45,18 @@ subtest 'create a heap', {
         heap-ok $heap, (1, 2, 3, 17, 19, 7, 36, 25, 100);
     }
 
+    subtest 'create a heap from an itemized list', {
+        my $list = list(25, 17, 36, 2, 19, 7, 3, 1, 100);
+        my $heap = MinHeap.new($list);
+        does-ok $heap, MinHeap, 'MinHeap.new($list)';
+        heap-ok $heap, Array.new($list);
+    }
+
     subtest 'create a heap from an itemized Slip', {
         my $slip = slip(25, 17, 36, 2, 19, 7, 3, 1, 100);
         my $heap = MinHeap.new($slip);
         does-ok $heap, MinHeap, 'MinHeap.new($slip)';
-        heap-ok $heap, Array.new($slip);
+        heap-ok $heap, (1, 2, 3, 17, 19, 7, 36, 25, 100);
     }
 };
 
