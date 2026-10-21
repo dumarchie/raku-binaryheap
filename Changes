@@ -1,5 +1,6 @@
-2.0.4
+2.0.4 2026-10-21
     - Consistently flatten itemized Slip in .new
+    - Let .values produce values on demand
 2.0.3 2026-10-19
     - Let .elems autovivify
     - Improve documentation

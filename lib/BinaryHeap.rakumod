@@ -199,16 +199,13 @@ role GenHeap[&infix:<tops>] is export {
     multi method Bool(::?CLASS:D: --> Bool:D) { $!elems > 0 }
     method top() { self ?? @!array[0] !! Nil }
 
-    # Expose number of values on the heap
+    # Expose (number of) values on the heap
     multi method elems(::?CLASS:U $self is rw: --> 0) { $self = self.new }
     multi method elems(::?CLASS:D:) { $!elems }
 
-    # Allow introspection, but do not return containers:
-    proto method values( --> Seq:D) {*}
-    multi method values(::?CLASS:U:) { Empty.Seq }
-    multi method values(::?CLASS:D:) {
-        # In Rakudo, .values on a native array slice returns a List
-        @!array[^$!elems].Seq;
+    multi method values(::?CLASS:D: --> Seq:D) {
+        my int $pos;
+        gather take @!array[$pos++] while $pos < $!elems;
     }
 
     multi method gist(::?CLASS:D:) {
@@ -515,7 +512,7 @@ empty.
 
 Defined as:
 
-    method values( --> Seq:D)
+    multi method values(::?CLASS:D: --> Seq:D)
 
 Returns a C<Seq> of the elements encountered during a breadth-first traversal of
 the heap.

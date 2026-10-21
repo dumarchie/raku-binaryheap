@@ -13,7 +13,6 @@ subtest 'uninitialized $heap', {
     is $heap.Bool, False, '$heap.Bool';
     is $heap.of, Mu, '$heap.of';
     is $heap.top, Nil, '$heap.top';
-    is-deeply $heap.values, (), '$heap.values';
     cmp-ok $heap, 'eqv', MinHeap, '$heap has not been autovivified';
 
     # .elems should autovivify
