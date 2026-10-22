@@ -131,7 +131,7 @@ Defined as:
     multi method elems(::?CLASS:U $self is rw: --> 0)
     multi method elems(::?CLASS:D:)
 
-Returns the number of elements in the heap. Autovivifies because Rakudo defines the number of elements in a type object as 1.
+Returns the number of elements in the heap. Autovivifies an uninitialized heap.
 
 method extract
 --------------
@@ -185,7 +185,7 @@ Defined as:
 
     method push(**@values --> ::?CLASS:D)
 
-Inserts the provided values into the heap and returns the modified heap. Autovivifies an uninitialized invocant.
+Inserts the provided values into the heap and returns the modified heap. Autovivifies an uninitialized heap.
 
 method push-pop
 ---------------
