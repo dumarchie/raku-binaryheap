@@ -478,7 +478,7 @@ Defined as:
 
 Functionally equivalent to, but more efficient than C<.push(value)> followed by
 C<.pop>. Replaces the top of the heap if its priority tops that of the provided
-value; otherwise returns the C<value> self.
+C<value>; otherwise just returns the provided C<value>.
 
 =head2 method raku
 
@@ -498,7 +498,7 @@ Defined as:
 
 Functionally equivalent to, but more efficient than C<.pop> followed by
 C<.push(new)>. Replaces the element at the top of the heap with the C<new> value
-and returns the old value.
+and returns the old value. Returns C<Nil> if called on an empty heap.
 
 =head2 method top
 

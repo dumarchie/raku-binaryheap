@@ -194,7 +194,7 @@ Defined as:
 
     method push-pop(Mu \value)
 
-Functionally equivalent to, but more efficient than `.push(value)` followed by `.pop`. Replaces the top of the heap if its priority tops that of the provided value; otherwise returns the `value` self.
+Functionally equivalent to, but more efficient than `.push(value)` followed by `.pop`. Replaces the top of the heap if its priority tops that of the provided `value`; otherwise just returns the provided `value`.
 
 method raku
 -----------
@@ -212,7 +212,7 @@ Defined as:
 
     method replace(Mu \new)
 
-Functionally equivalent to, but more efficient than `.pop` followed by `.push(new)`. Replaces the element at the top of the heap with the `new` value and returns the old value.
+Functionally equivalent to, but more efficient than `.pop` followed by `.push(new)`. Replaces the element at the top of the heap with the `new` value and returns the old value. Returns `Nil` if called on an empty heap.
 
 method top
 ----------
