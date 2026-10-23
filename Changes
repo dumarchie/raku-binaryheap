@@ -1,3 +1,6 @@
+2.0.5 2026-10-23
+    - Improve benchmark scripts
+    - Speed up .extract by 6%
 2.0.4 2026-10-21
     - Consistently flatten itemized Slip in .new
     - Let .values produce values on demand
