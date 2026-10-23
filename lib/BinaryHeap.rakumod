@@ -122,13 +122,14 @@ role GenHeap[&infix:<tops>] is export {
     }
 
     # Extract a Seq of values from a heap
-    proto method extract(| --> Seq:D) {*} 
-    multi method extract() {
-        gather take self!extract-one while self;
+    proto method extract(| --> Seq:D) {*}
+    multi method extract(::?ROLE:U: $n?) { Empty.Seq }
+    multi method extract(::?ROLE:D:) {
+        gather take self!extract-one while $!elems;
     }
-    multi method extract(\n) {
+    multi method extract(::?ROLE:D: \n) {
         my int $n = n;
-        gather take self!extract-one while self && $n-- > 0;
+        gather take self!extract-one while $!elems && $n-- > 0;
     }
 
     # Insert values into a heap
@@ -415,10 +416,10 @@ Returns the number of elements in the heap. Autovivifies an uninitialized heap.
 
 Defined as:
 
-    method extract(\n? --> Seq:D)
+    method extract($n? --> Seq:D)
 
 Returns a C<Seq> that generates values by popping elements from the heap until
-C<n> elements were extracted or the heap is empty. If no values are pushed onto
+C<$n> elements were extracted or the heap is empty. If no values are pushed onto
 the heap before the C<Seq> is exhausted, the sequence will be in non-decreasing
 order if called on a I<min-heap>, and in non-increasing order if called on a
 I<max-heap>.
