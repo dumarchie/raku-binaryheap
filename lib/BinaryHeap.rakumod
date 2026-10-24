@@ -206,9 +206,17 @@ role GenHeap[&infix:<tops>] is export {
     multi method elems(::?CLASS:U $self is rw: --> 0) { $self = self.new }
     multi method elems(::?CLASS:D:) { $!elems }
 
+    method AT-POS(\position) is implementation-detail { @!array[position] }
+
+    my class Traversal does Iterator {
+        has $.heap;
+        has int $!pos;
+        method pull-one() {
+            $!pos < $!heap.elems ?? $!heap[$!pos++] !! IterationEnd;
+        }
+    }
     multi method values(::?CLASS:D: --> Seq:D) {
-        my int $pos;
-        gather take @!array[$pos++] while $pos < $!elems;
+        Seq.new: Traversal.new(:heap(self));
     }
 
     multi method gist(::?CLASS:D:) {
