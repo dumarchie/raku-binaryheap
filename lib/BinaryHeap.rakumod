@@ -117,16 +117,15 @@ role GenHeap[&infix:<tops>] is export {
           X::Cannot::Empty.new(:action<pop>, :what(self.^name));
     }
     method extract-one() is implementation-detail {
-        my $value = @!array[--$!elems];
-        $!elems ?? self!replace-top($value) !! $value;
+        $!elems > 1
+          ?? self!replace-top(@!array[--$!elems])
+          !! $!elems == 1 ?? @!array[--$!elems] !! IterationEnd;
     }
 
     # Extract a Seq of values from a heap
     my class Extractor does Iterator {
         has $.heap;
-        method pull-one() {
-            $!heap.elems ?? $!heap.extract-one !! IterationEnd;
-        }
+        method pull-one() { $!heap.extract-one }
     }
 
     proto method extract(| --> Seq:D) {*}
