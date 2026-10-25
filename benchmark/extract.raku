@@ -1,6 +1,7 @@
 use BinaryHeap <MinHeap>;
 
-constant n = 2**16;
+constant n = 2**19;
+constant limit = 2**16;
 
 sub heap(\n, $type) {
     srand(42); # make roll reproducible
@@ -15,12 +16,12 @@ sub heap(\n, $type) {
     return MinHeap.new(values, :in-place);
 }
 
-sub MAIN(Int $n = n, Str :$array-of) {
+sub MAIN(Int $n = n, Str :$array-of, :$limit = limit) {
     my $heap = heap($n, $array-of);
-    print "Extract from heap with $n elems: ";
+    print "Extract $limit elems from heap with $n elems: ";
 
     my $time = now;
-    $heap.extract;
+    $heap.extract($limit);
     $time = now - $time;
     printf "%0.2fms\n", $time * 1000;
 }
