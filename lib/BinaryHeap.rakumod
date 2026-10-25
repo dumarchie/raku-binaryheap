@@ -123,13 +123,12 @@ role GenHeap[&infix:<tops>] is export {
 
     # Extract a Seq of values from a heap
     proto method extract(| --> Seq:D) {*}
-    multi method extract(::?ROLE:U: $n?) { Empty.Seq }
+    multi method extract(::?ROLE:U:) { Empty.Seq }
     multi method extract(::?ROLE:D:) {
         gather take self!extract-one while $!elems;
     }
-    multi method extract(::?ROLE:D: \n) {
-        my int $n = n;
-        gather take self!extract-one while $!elems && $n-- > 0;
+    multi method extract(\n) {
+        self.extract.head(n);
     }
 
     # Insert values into a heap
