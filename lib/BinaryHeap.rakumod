@@ -113,19 +113,26 @@ role GenHeap[&infix:<tops>] is export {
 
     # Extract a single value from a heap
     method pop() {
-        self ?? self!extract-one !! Failure.new:
+        self ?? self.extract-one !! Failure.new:
           X::Cannot::Empty.new(:action<pop>, :what(self.^name));
     }
-    method !extract-one() {
+    method extract-one() is implementation-detail {
         my $value = @!array[--$!elems];
         $!elems ?? self!replace-top($value) !! $value;
     }
 
     # Extract a Seq of values from a heap
+    my class Extractor does Iterator {
+        has $.heap;
+        method pull-one() {
+            $!heap.elems ?? $!heap.extract-one !! IterationEnd;
+        }
+    }
+
     proto method extract(| --> Seq:D) {*}
     multi method extract(::?ROLE:U:) { Empty.Seq }
     multi method extract(::?ROLE:D:) {
-        gather take self!extract-one while $!elems;
+        Seq.new: Extractor.new(:heap(self));
     }
     multi method extract(\n) {
         self.extract.head(n);
