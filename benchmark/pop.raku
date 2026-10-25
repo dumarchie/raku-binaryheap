@@ -17,7 +17,7 @@ sub heap(\n, $type) {
 
 sub MAIN(Int $n = n, Str :$array-of) {
     my $heap = heap($n, $array-of);
-    print "Pop from heap with $n elems: ";
+    print "Pop all elems from heap with $n elems: ";
 
     my $time = now;
     $heap.pop for ^$n;
