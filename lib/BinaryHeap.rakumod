@@ -20,7 +20,7 @@ role GenHeap[&infix:<tops>] is export {
     # the array may contain additional elements to accommodate a heapsort.
     has @!array;
     has int $!elems;
-    has @!path; # reusable path for sift-down
+    has @!descent; # reusable node array for sift-down
     method !SET-SELF(@array, $elems = @array.elems) {
         @!array := @array;
         $!elems = $elems;
@@ -32,43 +32,43 @@ role GenHeap[&infix:<tops>] is export {
     }
 
     # Sift down with bounce to reduce the number of comparisons
-    # Define a path down from a node at a given position, by selecting the
-    # highest priority (or right) child at each level. Then shorten the path
-    # until the final node can contain the value of the first node without
-    # violating the heap condition. Then assign each node in the path the value
-    # of its successor, and assign the final node the value of the first node.
+    # Define a descent from a node at a given position, by selecting the top
+    # priority child at each level. Then shorten the descent until the final
+    # node can contain the value of the first node without violating the heap
+    # condition. Then assign each node the value of its successor, and assign
+    # the last node the value of the first node.
     method !sift-down(int $pos is copy --> Nil) {
         my $node := @!array[$pos];
-        @!path.BIND-POS(my int $path-end, $node);
+        @!descent.BIND-POS(my int $depth, $node);
 
-        my int $heap-end = $!elems - 1;
-        while ($pos = ($pos * 2) + 1) < $heap-end {
+        my int $end = $!elems - 1;
+        while ($pos = ($pos * 2) + 1) < $end {
             my \left  = @!array[$pos];
             my \right = @!array[$pos + 1];
-            if left tops right {
-                @!path.BIND-POS(++$path-end, left);
+            if right tops left {
+                $pos += 1;
+                @!descent.BIND-POS(++$depth, right);
             }
             else {
-                $pos += 1;
-                @!path.BIND-POS(++$path-end, right);
+                @!descent.BIND-POS(++$depth, left);
             }
         }
 
         # at the deepest level there may be only one child
-        if $pos == $heap-end {
-            @!path.BIND-POS(++$path-end, @!array[$pos]);
+        if $pos == $end {
+            @!descent.BIND-POS(++$depth, @!array[$pos]);
         }
 
-        # shorten the path until the final node can hold the value of the first
+        # shorten descent until the last node can hold the value of the first
         my $value = $node;
-        while $path-end > 0 && $value tops @!path[$path-end] {
-            $path-end--;
+        while $depth > 0 && $value tops @!descent[$depth] {
+            $depth--;
         }
 
-        # shift values until we reach the final node of the path
+        # shift values until we reach the final node of the descent
         $pos = 0;
-        while $pos < $path-end {
-            my \child = @!path[++$pos];
+        while $pos < $depth {
+            my \child = @!descent[++$pos];
             $node  = child;
             $node := child;
         }
@@ -153,12 +153,12 @@ role GenHeap[&infix:<tops>] is export {
         self!insert(value);
     }
     method !insert(Mu \value) {
-        # increment $!elems only if the value can be assigned to a new node
+        # increment $!elems only if the value can be assigned to a node
         my $node := @!array[$!elems];
         $node = value;
-        my int $pos = $!elems++;
 
         # sift the provided value up from the new node
+        my int $pos = $!elems++;
         while $pos > 0
           && value tops my \parent = @!array[$pos = ($pos - 1) div 2]
         {
