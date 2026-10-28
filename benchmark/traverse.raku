@@ -20,7 +20,7 @@ sub MAIN(Int $n = n, Str :$array-of) {
     print "Traverse heap with $n elems: ";
 
     my $time = now;
-    $heap.values;
+    $heap.Seq;
     $time = now - $time;
     printf "%0.2fms\n", $time * 1000;
 }

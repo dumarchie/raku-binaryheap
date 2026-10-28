@@ -37,21 +37,21 @@ Apart from the mandatory `&infix:<eqv>` candidate, the following symbols in the 
 role GenHeap
 ------------
 
-    role GenHeap[&infix:<tops>] {
+    role GenHeap[&infix:<tops>] does Iterable { }
 
 Implements the heap data structure. Infix `tops` defines the heap invariant: no child node has a priority that tops the priority of its parent. See the implementations of `MaxHeap` and `MinHeap` for examples.
 
 class MaxHeap
 -------------
 
-    class MaxHeap does GenHeap[* cmp * == More] {}
+    class MaxHeap does GenHeap[* cmp * == More] { }
 
 A *max-heap* that uses Raku's built-in `infix:<cmp>` to compare the priority of elements.
 
 class MinHeap
 -------------
 
-    class MinHeap does GenHeap[* cmp * == Less] {}
+    class MinHeap does GenHeap[* cmp * == Less] { }
 
 A *min-heap* that uses Raku's built-in `infix:<cmp>` to compare the priority of elements.
 
@@ -108,30 +108,17 @@ This section documents the methods provided by role `GenHeap`.
 method Bool
 -----------
 
-Defined as:
-
-    multi method Bool(::?CLASS:D: --> Bool:D)
-
 Returns `True` if the heap contains at least one element, and `False` if the heap is empty.
 
 method clone
 ------------
-
-Defined as:
-
-    multi method clone(::?CLASS:D:)
 
 Returns a clone of the heap.
 
 method elems
 ------------
 
-Defined as:
-
-    multi method elems(::?CLASS:U $self is rw: --> 0)
-    multi method elems(::?CLASS:D:)
-
-Returns the number of elements in the heap. Autovivifies an uninitialized heap.
+Returns the number of elements in the heap.
 
 method extract
 --------------
@@ -145,11 +132,17 @@ Returns a `Seq` that generates values by popping elements from the heap until `$
 method gist
 -----------
 
-Defined as:
+Returns the gist of the heap.
 
-    multi method gist(::?CLASS:D:)
+method iterator
+---------------
 
-Returns the gist of the array underlying the heap.
+Returns an iterator that produces the elements encountered in a breadth-first traversal of the heap.
+
+method list
+-----------
+
+Returns the elements encountered during a breadth-first traversal of the heap.
 
 method new
 ----------
@@ -163,18 +156,10 @@ Constructs a new heap containing the provided values. If `values` is a single, n
 method of
 ---------
 
-Defined as:
-
-    method of()
-
 Returns the type constraint for the elements in the heap. Returns `Mu` by default, but a heap can be constrained to a specific element type by calling `.new` with a type-constrained array.
 
 method pop
 ----------
-
-Defined as:
-
-    method pop()
 
 Removes the element at the top of the heap and returns it, or returns a `Failure` if the heap is empty.
 
@@ -199,10 +184,6 @@ Functionally equivalent to, but more efficient than `.push(value)` followed by `
 method raku
 -----------
 
-Defined as:
-
-    multi method raku(::?CLASS:D:)
-
 Returns a string representation of the heap that can be `EVAL`ed to reconstruct the heap, provided it belongs to a named class. Used to compare the structural equivalence of heaps when the exported `&infix:eqv` candidate is not in scope.
 
 method replace
@@ -217,20 +198,7 @@ Functionally equivalent to, but more efficient than `.pop` followed by `.push(ne
 method top
 ----------
 
-Defined as:
-
-    method top()
-
 Returns the element stored at the top of the heap, or `Nil` if the heap is empty.
-
-method values
--------------
-
-Defined as:
-
-    multi method values(::?CLASS:D: --> Seq:D)
-
-Returns a `Seq` of the elements encountered during a breadth-first traversal of the heap.
 
 SEE ALSO
 ========

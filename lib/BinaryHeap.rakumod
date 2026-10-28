@@ -15,7 +15,7 @@ unit module BinaryHeap;
 # the priority of a node never tops the priority of its parent node
 proto sub infix:<tops>($, $) {*}
 
-role GenHeap[&infix:<tops>] is export {
+role GenHeap[&infix:<tops>] does Iterable is export {
     # The heap is represented by @!array[^$!elems];
     # the array may contain additional elements to accommodate a heapsort.
     has @!array;
@@ -207,11 +207,11 @@ role GenHeap[&infix:<tops>] is export {
     multi method Bool(::?CLASS:D: --> Bool:D) { $!elems > 0 }
     method top() { self ?? @!array[0] !! Nil }
 
-    # Expose (number of) values on the heap
-    multi method elems(::?CLASS:U $self is rw: --> 0) { $self = self.new }
+    # Expose (number of) heap elements
+    multi method elems(::?CLASS:U: --> 0) { }
     multi method elems(::?CLASS:D:) { $!elems }
 
-    method AT-POS(\position) is implementation-detail { @!array[position] }
+    method AT-POS(\pos) is implementation-detail { @!array[pos] }
 
     my class Traversal does Iterator {
         has $.heap;
@@ -220,12 +220,16 @@ role GenHeap[&infix:<tops>] is export {
             $!pos < $!heap.elems ?? $!heap[$!pos++] !! IterationEnd;
         }
     }
-    multi method values(::?CLASS:D: --> Seq:D) {
-        Seq.new: Traversal.new(:heap(self));
+    method iterator() {
+        Traversal.new(:heap(self));
     }
 
-    multi method gist(::?CLASS:D:) {
-        self.values.gist;
+    method list() {
+        self.Seq.list;
+    }
+
+    method gist() {
+        self.Seq.gist;
     }
 
     # Representation for core infix eqv
@@ -241,7 +245,7 @@ class MinHeap does GenHeap[* cmp * == Less] is export {}
 
 multi sub infix:<eqv>(GenHeap:D \a, GenHeap:D \b --> Bool:D)
                                             is export(:MANDATORY) {
-    a.WHAT === b.WHAT && a.values eqv b.values;
+    a.WHAT === b.WHAT && a.list eqv b.list;
 }
 
 # Heapsort
@@ -322,7 +326,7 @@ only, provide a list of symbol names to `use`.
 
 =head2 role GenHeap
 
-    role GenHeap[&infix:<tops>] {
+    role GenHeap[&infix:<tops>] does Iterable { }
 
 Implements the heap data structure. Infix C<tops> defines the heap invariant:
 no child node has a priority that tops the priority of its parent. See the
@@ -330,14 +334,14 @@ implementations of C<MaxHeap> and C<MinHeap> for examples.
 
 =head2 class MaxHeap
 
-    class MaxHeap does GenHeap[* cmp * == More] {}
+    class MaxHeap does GenHeap[* cmp * == More] { }
 
 A I<max-heap> that uses Raku's built-in C<infix:<cmp>> to compare the priority
 of elements.
 
 =head2 class MinHeap
 
-    class MinHeap does GenHeap[* cmp * == Less] {}
+    class MinHeap does GenHeap[* cmp * == Less] { }
 
 A I<min-heap> that uses Raku's built-in C<infix:<cmp>> to compare the priority
 of elements.
@@ -401,29 +405,16 @@ This section documents the methods provided by role C<GenHeap>.
 
 =head2 method Bool
 
-Defined as:
-
-    multi method Bool(::?CLASS:D: --> Bool:D)
-
 Returns C<True> if the heap contains at least one element, and C<False> if the
 heap is empty.
 
 =head2 method clone
 
-Defined as:
-
-    multi method clone(::?CLASS:D:)
-
 Returns a clone of the heap.
 
 =head2 method elems
 
-Defined as:
-
-    multi method elems(::?CLASS:U $self is rw: --> 0)
-    multi method elems(::?CLASS:D:)
-
-Returns the number of elements in the heap. Autovivifies an uninitialized heap.
+Returns the number of elements in the heap.
 
 =head2 method extract
 
@@ -439,11 +430,16 @@ I<max-heap>.
 
 =head2 method gist
 
-Defined as:
+Returns the gist of the heap.
 
-    multi method gist(::?CLASS:D:)
+=head2 method iterator
 
-Returns the gist of the array underlying the heap.
+Returns an iterator that produces the elements encountered in a breadth-first
+traversal of the heap.
+
+=head2 method list
+
+Returns the elements encountered during a breadth-first traversal of the heap.
 
 =head2 method new
 
@@ -458,19 +454,11 @@ array's type constraint applies to all elements in the heap.
 
 =head2 method of
 
-Defined as:
-
-    method of()
-
 Returns the type constraint for the elements in the heap. Returns C<Mu> by
 default, but a heap can be constrained to a specific element type by calling
 C<.new> with a type-constrained array.
 
 =head2 method pop
-
-Defined as:
-
-    method pop()
 
 Removes the element at the top of the heap and returns it, or returns a
 C<Failure> if the heap is empty.
@@ -496,10 +484,6 @@ C<value>; otherwise just returns the provided C<value>.
 
 =head2 method raku
 
-Defined as:
-
-    multi method raku(::?CLASS:D:)
-
 Returns a string representation of the heap that can be C<EVAL>ed to reconstruct
 the heap, provided it belongs to a named class. Used to compare the structural
 equivalence of heaps when the exported C<&infix:eqv> candidate is not in scope.
@@ -516,21 +500,8 @@ and returns the old value. Returns C<Nil> if called on an empty heap.
 
 =head2 method top
 
-Defined as:
-
-    method top()
-
 Returns the element stored at the top of the heap, or C<Nil> if the heap is
 empty.
-
-=head2 method values
-
-Defined as:
-
-    multi method values(::?CLASS:D: --> Seq:D)
-
-Returns a C<Seq> of the elements encountered during a breadth-first traversal of
-the heap.
 
 =head1 SEE ALSO
 

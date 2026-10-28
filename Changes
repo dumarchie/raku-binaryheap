@@ -1,3 +1,6 @@
+2.1.0
+    - Make .elems on GenHeap type object always return 0
+    - GenHeap does Iterable
 2.0.6 2026-10-23
     - Speed up traversal and extraction
 2.0.5 2026-10-23
