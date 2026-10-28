@@ -4,7 +4,10 @@ plan 7;
 use BinaryHeap <MaxHeap MinHeap &heapsort>;
 
 subtest 'infix eqv', {
-    # Note: Raku++ does not appear to support :MANDATORY exports
+    ok MaxHeap eqv MaxHeap.new,
+      'MaxHeap eqv MaxHeap.new';
+    ok MaxHeap !eqv MinHeap.new,
+      'MaxHeap !eqv MinHeap.new';
     ok MaxHeap.new(42) eqv MaxHeap.new(42),
       'MaxHeap.new(42) eqv MaxHeap.new(42)';
     ok MaxHeap.new(42) !eqv MinHeap.new(42),

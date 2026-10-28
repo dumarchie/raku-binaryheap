@@ -60,7 +60,7 @@ infix eqv
 
 Defined as:
 
-    multi sub infix:<eqv>(GenHeap:D \a, GenHeap:D \b --> Bool:D)
+    multi sub infix:<eqv>(GenHeap \a, GenHeap \b --> Bool:D)
 
 Returns `True` if and only if the two heaps are of the same type and contain equivalent elements at each position.
 
