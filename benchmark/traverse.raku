@@ -1,6 +1,6 @@
 use BinaryHeap <MinHeap>;
 
-constant n = 2**16;
+constant n = 2**19;
 
 sub heap(\n, $type) {
     srand(42); # make roll reproducible
