@@ -20,7 +20,7 @@ Module `BinaryHeap` implements a heap data structure and an (in-place) `heapsort
 
 Module `BinaryHeap` provides two classes that do the `GenHeap` role using Raku's built-in three-way comparison operator: `MaxHeap` and `MinHeap`. These heaps do not distinguish between a heap element and its priority. The dynamic `max-heap` and `min-heap` factories accept a custom comparator that may define an element's priority differently.
 
-In many cases, an uninitialized heap can be manipulated as if it were an empty object instance. Methods that add values autovivify the heap, which means they can only be called on a *container*. For example:
+An uninitialized heap can be manipulated as if it were an empty heap instance. Methods that add values autovivify an uninitialized heap. For example:
 
     my MinHeap $heap;
     say $heap.values;      # OUTPUT: «()␤»
