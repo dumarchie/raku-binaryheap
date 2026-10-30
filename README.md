@@ -144,6 +144,15 @@ method list
 
 Returns the elements encountered during a breadth-first traversal of the heap.
 
+method merge
+------------
+
+Defined as:
+
+    method merge(+values --> ::?CLASS:D)
+
+Merges the provided values into the heap and returns the modified heap. Autovivifies an uninitialized heap.
+
 method new
 ----------
 

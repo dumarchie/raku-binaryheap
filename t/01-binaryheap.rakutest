@@ -1,5 +1,5 @@
 use Test;
-plan 9;
+plan 10;
 
 use BinaryHeap <MinHeap MaxHeap>;
 
@@ -207,7 +207,7 @@ subtest 'heapify', {
 
     my Int @heapified = 1, 2, 3, 17, 19, 7, 36, 25, 100;
     is-deeply @array, @heapified,
-      '... and puts the elements of the provieded @array in heap order';
+      '... and puts the elements of the provided @array in heap order';
 
     does-ok $heap, MinHeap, 'the return value is a heap';
     heap-ok $heap, @heapified.List, 'the heap is based on the @array';
@@ -220,4 +220,20 @@ subtest 'heapify', {
 
     my $heap2 = $heap.clone;
     is $heap2.of, Int, '.clone maintains the type constraint of the heap';
+}
+
+subtest 'merge', {
+    my \values = 25, 17, 36, 2, 19, 7, 3, 1, 100;
+    
+    subtest 'merge into uninitialized heap', {
+        my MaxHeap $heap;
+        $heap.merge(values);
+        heap-ok $heap, (100, 25, 36, 17, 19, 7, 3, 1, 2);
+    }
+    
+    subtest 'merge into non-empty heap', {
+        my $heap = MaxHeap.new(11, 5, 8, 3, 4);
+        $heap.merge(values);
+        heap-ok $heap, (100, 25, 36, 5, 19, 8, 17, 3, 2, 4, 7, 3, 1, 11);
+    }
 }

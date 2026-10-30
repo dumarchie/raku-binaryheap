@@ -111,6 +111,15 @@ role GenHeap[&infix:<tops>] does Iterable is export {
         self.CREATE!SET-SELF(@!array.clone, $!elems);
     }
 
+    # Merge values into a heap
+    proto method merge(| --> ::?CLASS:D) {*}
+    multi method merge(::?CLASS:U $self is rw: +values) {
+        $self = self.new(values);
+    }
+    multi method merge(::?CLASS:D: +values) {
+        self!insert-iterable(values);
+    }
+
     # Extract a single value from a heap
     method pop() {
         self ?? self.extract-one !! Failure.new:
@@ -438,6 +447,15 @@ traversal of the heap.
 =head2 method list
 
 Returns the elements encountered during a breadth-first traversal of the heap.
+
+=head2 method merge
+
+Defined as:
+
+    method merge(+values --> ::?CLASS:D)
+
+Merges the provided values into the heap and returns the modified heap.
+Autovivifies an uninitialized heap.
 
 =head2 method new
 
