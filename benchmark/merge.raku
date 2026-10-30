@@ -19,15 +19,24 @@ sub heap(\n, $type) {
     }
 }
 
-sub MAIN(Int $n = n, Int $m = m, Str :$array-of = 'Mu') {
+sub MAIN(Int $n = n, Int $m = m, Str :$array-of = 'Mu', Bool() :$with-heap) {
     srand(42); # make roll reproducible
     
     my $heap = heap($n, $array-of);
-    my \values = roll($m);
-    print "Merge $m values into a heap with $n elems: ";
+    my &merge;
+    if $with-heap {
+        my \heap2 = heap($m, 'Mu'); # not itemized!
+        &merge = { $heap.merge(heap2) };
+        print "Merge heap with $m elems into a heap with $n elems: ";
+    }
+    else {
+        my \values = roll($m);
+        &merge = { $heap.merge(values) };
+        print "Merge $m values into a heap with $n elems: ";
+    }
 
     my $time = now;
-    $heap.merge(values);
+    merge;
     $time = now - $time;
 
     printf "%0.2fms\n", $time * 1000;
