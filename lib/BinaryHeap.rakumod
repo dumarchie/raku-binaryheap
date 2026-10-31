@@ -244,6 +244,10 @@ role GenHeap[&infix:<tops>] does Iterable is export {
         Traversal.new(:heap(self));
     }
 
+    method values() {
+        self.Seq;
+    }
+
     method list() {
         self.Seq.list;
     }
@@ -529,6 +533,11 @@ and returns the old value. Returns C<Nil> if called on an empty heap.
 
 Returns the element stored at the top of the heap, or C<Nil> if the heap is
 empty.
+
+=head2 method values
+
+Returns a C<Seq> of the elements encountered during a breadth-first traversal of
+the heap.
 
 =head1 SEE ALSO
 

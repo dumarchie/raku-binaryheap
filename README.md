@@ -209,6 +209,11 @@ method top
 
 Returns the element stored at the top of the heap, or `Nil` if the heap is empty.
 
+method values
+-------------
+
+Returns a `Seq` of the elements encountered during a breadth-first traversal of the heap.
+
 SEE ALSO
 ========
 

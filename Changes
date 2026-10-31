@@ -1,8 +1,10 @@
-2.1.0
+2.1.1 2026-10-31
+    - Support efficient merge of values produced by Iterable
+2.1.0 2026-10-29
     - GenHeap does Iterable
     - Make .elems on uninitialized heap always return 0
     - Let uninitialized heap eqv empty heap again
-2.0.6 2026-10-23
+2.0.6 2026-10-25
     - Speed up traversal and extraction
 2.0.5 2026-10-23
     - Improve benchmark scripts
