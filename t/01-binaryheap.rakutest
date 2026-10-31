@@ -225,15 +225,34 @@ subtest 'heapify', {
 subtest 'merge', {
     my \values = 25, 17, 36, 2, 19, 7, 3, 1, 100;
     
-    subtest 'merge into uninitialized heap', {
+    subtest 'merge multiple values into uninitialized heap', {
         my MaxHeap $heap;
-        $heap.merge(values);
+        $heap.merge(|values);
         heap-ok $heap, (100, 25, 36, 17, 19, 7, 3, 1, 2);
     }
     
-    subtest 'merge into non-empty heap', {
+    subtest 'merge multiple values into non-empty heap', {
         my $heap = MaxHeap.new(11, 5, 8, 3, 4);
-        $heap.merge(values);
+        $heap.merge(|values);
         heap-ok $heap, (100, 25, 36, 5, 19, 8, 17, 3, 2, 4, 7, 3, 1, 11);
+    }
+
+    subtest 'merge content of itemized Slip', {
+        my $heap = MaxHeap.new(11, 5, 8, 3, 4);
+        $heap.merge(values.Slip.item);
+        heap-ok $heap, (100, 25, 36, 5, 19, 8, 17, 3, 2, 4, 7, 3, 1, 11);
+    }
+
+    my $heap2 := MinHeap.new(values);
+    subtest 'merge values produced by Iterable', {
+        my $heap = MaxHeap.new(11, 5, 8, 3, 4);
+        $heap.merge($heap2);
+        heap-ok $heap, (100, 17, 36, 5, 11, 19, 25, 3, 3, 4, 7, 1, 8, 2);
+    }
+
+    subtest 'merge itemized Iterable', {
+        my $heap = MaxHeap.new(11, 5, 8, 3, 4);
+        $heap.merge($heap2.item);
+        heap-ok $heap, ($heap2, 5, 11, 3, 4, 8);
     }
 }

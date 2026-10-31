@@ -116,9 +116,20 @@ role GenHeap[&infix:<tops>] does Iterable is export {
     multi method merge(::?CLASS:U $self is rw: +values) {
         $self = self.new(values);
     }
-    multi method merge(::?CLASS:D: +values) {
+    multi method merge(::?CLASS:D: **@values is raw) {
+        self!insert-iterable(@values);
+    }
+    multi method merge(::?CLASS:D: Slip \values) {
         self!insert-iterable(values);
     }
+    multi method merge(::?CLASS:D: Iterable \value) {
+        if value.VAR !=== value {
+            self!insert(value);
+        }
+        else {
+            self!insert-iterable(value);
+        }
+   }
 
     # Extract a single value from a heap
     method pop() {

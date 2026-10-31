@@ -6,5 +6,6 @@ lib/.precomp
 sdist
 BinaryHeap-*.tar.gz
 
-# benchmark logs
+# profiles and benchmark logs
+profile-*.html
 benchmark/*.log
