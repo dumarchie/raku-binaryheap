@@ -237,7 +237,7 @@ role GenHeap[&infix:<tops>] does Iterable is export {
         has $.heap;
         has int $!pos;
         method pull-one() {
-            $!pos < $!heap.elems ?? $!heap[$!pos++] !! IterationEnd;
+            $!pos < $!heap.elems ?? $!heap.AT-POS($!pos++) !! IterationEnd;
         }
     }
     method iterator() {

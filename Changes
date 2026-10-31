@@ -1,3 +1,5 @@
+2.1.2
+    - Speed up traversal
 2.1.1 2026-10-31
     - Support efficient merge of values produced by Iterable
 2.1.0 2026-10-29
