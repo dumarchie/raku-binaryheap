@@ -87,16 +87,16 @@ role GenHeap[&infix:<tops>] does Iterable is export {
     multi method new(Slip \values) {
         self.CREATE!SET-SELF(values.Array);
     }
-    multi method new(Iterable \value, Bool() :$in-place) {
+    multi method new(Iterable \arg, Bool() :$in-place) {
         my @values;
-        if value.VAR !=== value {
-            @values = value;
+        if arg.VAR !=== arg {
+            @values = arg;
         }
-        elsif value ~~ Array|array {
-            @values := $in-place ?? value !! value.clone;
+        elsif arg ~~ Array|array {
+            @values := $in-place ?? arg !! arg.clone;
         }
         else {
-            @values := value.Array;
+            @values := arg.Array;
         }
         self.CREATE!SET-SELF(@values);
     }
@@ -113,16 +113,16 @@ role GenHeap[&infix:<tops>] does Iterable is export {
 
     # Merge values into a heap
     proto method merge(| --> ::?CLASS:D) {*}
-    multi method merge(::?CLASS:U $self is rw: |values) {
+    multi method merge(::?ROLE:U $self is rw: |values) {
         $self = self.new(|values);
     }
-    multi method merge(::?CLASS:D: **@values is raw) {
+    multi method merge(::?ROLE:D: **@values is raw) {
         self!insert-iterable(@values);
     }
-    multi method merge(::?CLASS:D: Slip \values) {
+    multi method merge(::?ROLE:D: Slip \values) {
         self!insert-iterable(values);
     }
-    multi method merge(::?CLASS:D: Iterable \arg) {
+    multi method merge(::?ROLE:D: Iterable \arg) {
         arg.VAR === arg
           ?? self!insert-iterable(arg)
           !! self!insert(arg);
@@ -156,9 +156,8 @@ role GenHeap[&infix:<tops>] does Iterable is export {
 
     # Insert values into a heap
     proto method push(| --> ::?CLASS:D) {*}
-    multi method push(::?ROLE:U $self is rw: **@values is raw) {
-        # Note: this may yield a different heap structure than .new(@values)
-        $self = self.CREATE.push(|@values);
+    multi method push(::?ROLE:U $self is rw: |values) {
+        $self = self.CREATE.push(|values);
     }
     multi method push(::?ROLE:D: **@values is raw) {
         self!insert-iterable(@values);
