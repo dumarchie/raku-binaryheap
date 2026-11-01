@@ -10,7 +10,7 @@ sub roll(\n) {
     eager (^n).roll(n);
 }
 
-sub heap(\n, $type = 'Mu') {
+sub heap(\n, $type) {
     my \values = (^n).roll(n);
     do given $type {
         when 'Mu'  { MinHeap.new(values)            }
@@ -24,7 +24,7 @@ sub MAIN(Int $n = n, Int $m = m, Str :$array-of = 'Mu', Bool() :$with-heap) {
     srand(42); # make roll reproducible
     
     my $heap = heap($n, $array-of);
-    my \values = $with-heap ?? heap($m) !! roll($m);
+    my \values = $with-heap ?? heap($m, $array-of) !! roll($m);
     print "Merge {values.^name} with $m elems into a heap with $n elems: ";
 
     my $time = now;

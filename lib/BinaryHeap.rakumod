@@ -113,8 +113,8 @@ role GenHeap[&infix:<tops>] does Iterable is export {
 
     # Merge values into a heap
     proto method merge(| --> ::?CLASS:D) {*}
-    multi method merge(::?CLASS:U $self is rw: +values) {
-        $self = self.new(values);
+    multi method merge(::?CLASS:U $self is rw: |values) {
+        $self = self.new(|values);
     }
     multi method merge(::?CLASS:D: **@values is raw) {
         self!insert-iterable(@values);
@@ -122,13 +122,10 @@ role GenHeap[&infix:<tops>] does Iterable is export {
     multi method merge(::?CLASS:D: Slip \values) {
         self!insert-iterable(values);
     }
-    multi method merge(::?CLASS:D: Iterable \value) {
-        if value.VAR !=== value {
-            self!insert(value);
-        }
-        else {
-            self!insert-iterable(value);
-        }
+    multi method merge(::?CLASS:D: Iterable \arg) {
+        arg.VAR === arg
+          ?? self!insert-iterable(arg)
+          !! self!insert(arg);
    }
 
     # Extract a single value from a heap
@@ -174,7 +171,7 @@ role GenHeap[&infix:<tops>] does Iterable is export {
     }
     method !insert(Mu \value) {
         # increment $!elems only if the value can be assigned to a node
-        my $node := @!array[$!elems];
+        my $node := @!array.AT-POS($!elems);
         $node = value;
 
         # sift the provided value up from the new node
