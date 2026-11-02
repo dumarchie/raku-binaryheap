@@ -220,7 +220,7 @@ role GenHeap[&infix:<tops>] does Iterable is export {
         @!array;
     }
 
-    multi method Bool(::?CLASS:D: --> Bool:D) { $!elems > 0 }
+    multi method Bool(::?ROLE:D: --> Bool:D) { $!elems > 0 }
     method top() { self ?? @!array[0] !! Nil }
 
     # Expose (number of) heap elements
