@@ -167,8 +167,9 @@ role GenHeap[&infix:<tops>] does Iterable is export {
     }
     multi method push(::?ROLE:D: Mu \value) {
         self!insert(value);
+        self;
     }
-    method !insert(Mu \value) {
+    method !insert(Mu \value --> Nil) {
         # increment $!elems only if the value can be assigned to a node
         my $node := @!array.AT-POS($!elems);
         $node = value;
@@ -182,7 +183,6 @@ role GenHeap[&infix:<tops>] does Iterable is export {
             $node := parent;
         }
         $node = value;
-        self;
     }
     method !insert-iterable(\values) {
         self!insert($_) for values;
@@ -196,18 +196,14 @@ role GenHeap[&infix:<tops>] does Iterable is export {
 
     # Replace the top of a heap (extract, then insert)
     proto method replace(|) {*}
-    multi method replace(::?ROLE:U $self is rw: Mu \value --> Nil) {
+    multi method replace(::?ROLE:U $self is rw: Mu \new) {
         $self = self.CREATE;
-        $self!insert(value);
+        $self!insert(new);
     }
-    multi method replace(::?ROLE:D: Mu \value) {
-        if $!elems > 0 {
-            self!swap(value);
-        }
-        else {
-            self!insert(value);
-            Nil;
-        }
+    multi method replace(::?ROLE:D: Mu \new) {
+        $!elems > 0
+          ?? self!swap(new)
+          !! self!insert(new);
     }
     method !swap(Mu \new) {
         my $value = @!array[0];
