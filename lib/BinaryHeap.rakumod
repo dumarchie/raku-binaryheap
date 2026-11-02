@@ -103,26 +103,26 @@ role GenHeap[&infix:<tops>] does Iterable is export {
 
     # A heap has the type constraint of the underlying array
     proto method of() {*}
-    multi method of(::?CLASS:U:) { Mu }
-    multi method of(::?CLASS:D:) { @!array.of }
+    multi method of(GenHeap:U:) { Mu }
+    multi method of(GenHeap:D:) { @!array.of }
 
     # A clone should retain a constraint on element type
-    multi method clone(::?CLASS:D:) {
+    multi method clone(GenHeap:D:) {
         self.CREATE!SET-SELF(@!array.clone, $!elems);
     }
 
     # Merge values into a heap
     proto method merge(| --> ::?CLASS:D) {*}
-    multi method merge(::?ROLE:U $self is rw: |values) {
+    multi method merge(GenHeap:U $self is rw: |values) {
         $self = self.new(|values);
     }
-    multi method merge(::?ROLE:D: **@values is raw) {
+    multi method merge(GenHeap:D: **@values is raw) {
         self!insert-iterable(@values);
     }
-    multi method merge(::?ROLE:D: Slip \values) {
+    multi method merge(GenHeap:D: Slip \values) {
         self!insert-iterable(values);
     }
-    multi method merge(::?ROLE:D: Iterable \arg) {
+    multi method merge(GenHeap:D: Iterable \arg) {
         arg.VAR === arg
           ?? self!insert-iterable(arg)
           !! self!insert(arg);
@@ -130,10 +130,10 @@ role GenHeap[&infix:<tops>] does Iterable is export {
 
     # Extract a single value from a heap
     proto method pop() {*}
-    multi method pop(::?ROLE:U:) {
+    multi method pop(GenHeap:U:) {
         fail X::Cannot::Empty.new(:action<pop>, :what(self.^name));
     }
-    multi method pop(::?ROLE:D:) {
+    multi method pop(GenHeap:D:) {
         $!elems > 0 ?? self.extract-one !! self.WHAT.pop;
     }
     method extract-one() is implementation-detail {
@@ -149,8 +149,8 @@ role GenHeap[&infix:<tops>] does Iterable is export {
     }
 
     proto method extract(| --> Seq:D) {*}
-    multi method extract(::?ROLE:U:) { Empty.Seq }
-    multi method extract(::?ROLE:D:) {
+    multi method extract(GenHeap:U:) { Empty.Seq }
+    multi method extract(GenHeap:D:) {
         Seq.new: Extractor.new(:heap(self));
     }
     multi method extract(\n) {
@@ -159,16 +159,16 @@ role GenHeap[&infix:<tops>] does Iterable is export {
 
     # Insert values into a heap
     proto method push(| --> ::?CLASS:D) {*}
-    multi method push(::?ROLE:U $self is rw: |values) {
+    multi method push(GenHeap:U $self is rw: |values) {
         $self = self.CREATE.push(|values);
     }
-    multi method push(::?ROLE:D: **@values is raw) {
+    multi method push(GenHeap:D: **@values is raw) {
         self!insert-iterable(@values);
     }
-    multi method push(::?ROLE:D: Slip \values) {
+    multi method push(GenHeap:D: Slip \values) {
         self!insert-iterable(values);
     }
-    multi method push(::?ROLE:D: Mu \value) {
+    multi method push(GenHeap:D: Mu \value) {
         self!insert(value);
         self;
     }
@@ -199,11 +199,11 @@ role GenHeap[&infix:<tops>] does Iterable is export {
 
     # Replace the top of a heap (extract, then insert)
     proto method replace(|) {*}
-    multi method replace(::?ROLE:U $self is rw: Mu \new) {
+    multi method replace(GenHeap:U $self is rw: Mu \new) {
         $self = self.CREATE;
         $self!insert(new);
     }
-    multi method replace(::?ROLE:D: Mu \new) {
+    multi method replace(GenHeap:D: Mu \new) {
         $!elems > 0
           ?? self!swap(new)
           !! self!insert(new);
@@ -224,12 +224,12 @@ role GenHeap[&infix:<tops>] does Iterable is export {
         @!array;
     }
 
-    multi method Bool(::?ROLE:D: --> Bool:D) { $!elems > 0 }
+    multi method Bool(GenHeap:D: --> Bool:D) { $!elems > 0 }
     method top() { self ?? @!array[0] !! Nil }
 
     # Expose (number of) heap elements
-    multi method elems(::?ROLE:U: --> 0) { }
-    multi method elems(::?ROLE:D:) { $!elems }
+    multi method elems(GenHeap:U: --> 0) { }
+    multi method elems(GenHeap:D:) { $!elems }
 
     method AT-POS(\pos) is implementation-detail { @!array[pos] }
 
@@ -257,9 +257,9 @@ role GenHeap[&infix:<tops>] does Iterable is export {
     }
 
     # Representation for core infix eqv
-    multi method raku(::?CLASS:D:) {
-        my $cons = "{self.^name}.new";
-        $!elems ?? $cons ~ @!array[^$!elems].raku !! $cons;
+    multi method raku(GenHeap:D:) {
+        my $default = "{self.^name}.new";
+        $!elems ?? $default ~ @!array[^$!elems].raku !! $default;
     }
 }
 
