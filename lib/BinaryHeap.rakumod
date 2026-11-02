@@ -141,6 +141,13 @@ role GenHeap[&infix:<tops>] does Iterable is export {
           ?? self!swap(@!array[--$!elems])
           !! $!elems == 1 ?? @!array[--$!elems] !! IterationEnd;
     }
+    method !swap(Mu \new) {
+        my $node := @!array[0];
+        my $value = $node;
+        $node = new;
+        self!sift-down(0);
+        $value;
+    }
 
     # Extract a Seq of values from a heap
     my class Extractor does Iterator {
@@ -207,12 +214,6 @@ role GenHeap[&infix:<tops>] does Iterable is export {
         $!elems > 0
           ?? self!swap(new)
           !! self!insert(new);
-    }
-    method !swap(Mu \new) {
-        my $value = @!array[0];
-        @!array[0] = new;
-        self!sift-down(0);
-        $value;
     }
 
     # The actual heapsort implementation
