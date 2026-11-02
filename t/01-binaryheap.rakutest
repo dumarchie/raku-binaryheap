@@ -81,6 +81,12 @@ subtest 'push onto a heap', {
 };
 
 subtest 'replace the top of a heap', {
+    subtest 'replace into uninitialized heap', {
+        my MinHeap $heap;
+        is $heap.replace(Mu), Nil, '.replace(value) returns Nil';
+        heap-ok $heap, (Mu,), 'heap contains the provided value';
+    };
+
     subtest 'replace into an empty heap', {
         my $heap = MinHeap.new;
         is $heap.replace(Mu), Nil, '.replace(value) returns Nil';

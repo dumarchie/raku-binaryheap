@@ -135,7 +135,7 @@ role GenHeap[&infix:<tops>] does Iterable is export {
     }
     method extract-one() is implementation-detail {
         $!elems > 1
-          ?? self!replace-top(@!array[--$!elems])
+          ?? self!swap(@!array[--$!elems])
           !! $!elems == 1 ?? @!array[--$!elems] !! IterationEnd;
     }
 
@@ -195,16 +195,21 @@ role GenHeap[&infix:<tops>] does Iterable is export {
     }
 
     # Replace the top of a heap (extract, then insert)
-    method replace(\SELF: Mu \new) {
-        if self {
-            self!replace-top(new);
+    proto method replace(|) {*}
+    multi method replace(::?ROLE:U $self is rw: Mu \value --> Nil) {
+        $self = self.CREATE;
+        $self!insert(value);
+    }
+    multi method replace(::?ROLE:D: Mu \value) {
+        if $!elems > 0 {
+            self!swap(value);
         }
         else {
-            SELF.push(new);
+            self!insert(value);
             Nil;
         }
     }
-    method !replace-top(Mu \new) {
+    method !swap(Mu \new) {
         my $value = @!array[0];
         @!array[0] = new;
         self!sift-down(0);
