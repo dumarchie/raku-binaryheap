@@ -129,9 +129,12 @@ role GenHeap[&infix:<tops>] does Iterable is export {
    }
 
     # Extract a single value from a heap
-    method pop() {
-        self ?? self.extract-one !! Failure.new:
-          X::Cannot::Empty.new(:action<pop>, :what(self.^name));
+    proto method pop() {*}
+    multi method pop(::?ROLE:U:) {
+        fail X::Cannot::Empty.new(:action<pop>, :what(self.^name));
+    }
+    multi method pop(::?ROLE:D:) {
+        $!elems > 0 ?? self.extract-one !! self.WHAT.pop;
     }
     method extract-one() is implementation-detail {
         $!elems > 1
