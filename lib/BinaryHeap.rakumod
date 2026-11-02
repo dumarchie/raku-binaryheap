@@ -224,8 +224,8 @@ role GenHeap[&infix:<tops>] does Iterable is export {
     method top() { self ?? @!array[0] !! Nil }
 
     # Expose (number of) heap elements
-    multi method elems(::?CLASS:U: --> 0) { }
-    multi method elems(::?CLASS:D:) { $!elems }
+    multi method elems(::?ROLE:U: --> 0) { }
+    multi method elems(::?ROLE:D:) { $!elems }
 
     method AT-POS(\pos) is implementation-detail { @!array[pos] }
 
