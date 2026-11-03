@@ -1,15 +1,8 @@
 use BinaryHeap <MinHeap>;
 
-constant m = 2**19;
+constant n = 2**19;
 
-sub roll(\n) {
-    my \values = (^n).roll(n);
-    values.elems; # reifies
-    return values;
-}
-
-sub heap(\n, $type) {
-    my \values = roll(n);
+sub heap(\values, $type) {
     do given $type {
         when 'Mu'  { MinHeap.new(values)            }
         when 'Int' { MinHeap.new(my Int @ = values) } 
@@ -18,12 +11,13 @@ sub heap(\n, $type) {
     }
 }
 
-sub MAIN(Int $n = 0, Int $m = m, Str :$array-of = 'Mu') {
-    srand(42); # make roll reproducible
+sub MAIN(Int $n = n, Str :$array-of = 'Mu') {
+    srand(42); # make roll/pick reproducible
     
-    my $heap = heap($n, $array-of);
-    my \values = roll($m);
-    print "Push $m values onto a heap with $n elems: ";
+    my \values = eager (^$n).roll($n);
+    my $m = $n div 2;
+    my $heap = heap(values.pick($m), $array-of);
+    print "Push $n values onto a heap with $m elems: ";
 
     my $time = now;
     $heap.push($_) for values;
