@@ -78,7 +78,7 @@ role GenHeap[&infix:<tops>] does Iterable is export {
     }
 
     # Construct a heap with zero or more values
-    proto method new(| --> ::?CLASS:D) {*}
+    proto method new(|) {*}
     multi method new() { self.CREATE }
     multi method new(**@values) {
         self.CREATE!SET-SELF(@values);
@@ -112,7 +112,7 @@ role GenHeap[&infix:<tops>] does Iterable is export {
     }
 
     # Merge values into a heap
-    proto method merge(| --> ::?CLASS:D) {*}
+    proto method merge(|) {*}
     multi method merge(GenHeap:U $self is rw: |values) {
         $self = self.new(|values);
     }
@@ -155,7 +155,7 @@ role GenHeap[&infix:<tops>] does Iterable is export {
         method pull-one() { $!heap.extract-one }
     }
 
-    proto method extract(| --> Seq:D) {*}
+    proto method extract(|) {*}
     multi method extract(GenHeap:U:) { Empty.Seq }
     multi method extract(GenHeap:D:) {
         Seq.new: Extractor.new(:heap(self));
@@ -165,7 +165,7 @@ role GenHeap[&infix:<tops>] does Iterable is export {
     }
 
     # Insert values into a heap
-    proto method push(| --> ::?CLASS:D) {*}
+    proto method push(|) {*}
     multi method push(GenHeap:U $self is rw: |values) {
         $self = self.CREATE.push(|values);
     }
@@ -382,7 +382,6 @@ equivalent elements at each position.
 
 Defined as:
 
-    proto sub heapsort(|)
     multi sub heapsort(@values, Bool() :$reverse)
     multi sub heapsort(&comparator, @values, Bool() :$reverse)
 
@@ -443,7 +442,7 @@ Returns the number of elements in the heap.
 
 Defined as:
 
-    method extract($n? --> Seq:D)
+    method extract($n?)
 
 Returns a C<Seq> that generates values by popping elements from the heap until
 C<$n> elements were extracted or the heap is empty. If no values are pushed onto
@@ -468,7 +467,7 @@ Returns the elements encountered during a breadth-first traversal of the heap.
 
 Defined as:
 
-    method merge(+values --> ::?CLASS:D)
+    method merge(+values)
 
 Merges the provided values into the heap and returns the modified heap.
 Autovivifies an uninitialized heap.
@@ -477,7 +476,7 @@ Autovivifies an uninitialized heap.
 
 Defined as:
 
-    method new(+values, Bool() :$in-place --> ::?CLASS:D)
+    method new(+values, Bool() :$in-place)
 
 Constructs a new heap containing the provided values. If C<values> is a single,
 non-itemized array, the C<:in-place> adverb causes the array to be heapified in
@@ -499,7 +498,7 @@ C<Failure> if the heap is empty.
 
 Defined as:
 
-    method push(**@values --> ::?CLASS:D)
+    method push(**@values)
 
 Inserts the provided values into the heap and returns the modified heap.
 Autovivifies an uninitialized heap.

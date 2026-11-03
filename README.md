@@ -69,7 +69,6 @@ sub heapsort
 
 Defined as:
 
-    proto sub heapsort(|)
     multi sub heapsort(@values, Bool() :$reverse)
     multi sub heapsort(&comparator, @values, Bool() :$reverse)
 
@@ -125,7 +124,7 @@ method extract
 
 Defined as:
 
-    method extract($n? --> Seq:D)
+    method extract($n?)
 
 Returns a `Seq` that generates values by popping elements from the heap until `$n` elements were extracted or the heap is empty. If no values are pushed onto the heap before the `Seq` is exhausted, the sequence will be in non-decreasing order if called on a *min-heap*, and in non-increasing order if called on a *max-heap*.
 
@@ -149,7 +148,7 @@ method merge
 
 Defined as:
 
-    method merge(+values --> ::?CLASS:D)
+    method merge(+values)
 
 Merges the provided values into the heap and returns the modified heap. Autovivifies an uninitialized heap.
 
@@ -158,7 +157,7 @@ method new
 
 Defined as:
 
-    method new(+values, Bool() :$in-place --> ::?CLASS:D)
+    method new(+values, Bool() :$in-place)
 
 Constructs a new heap containing the provided values. If `values` is a single, non-itemized array, the `:in-place` adverb causes the array to be heapified in place. By default, an array is cloned before heapification. In either case, the array's type constraint applies to all elements in the heap.
 
@@ -177,7 +176,7 @@ method push
 
 Defined as:
 
-    method push(**@values --> ::?CLASS:D)
+    method push(**@values)
 
 Inserts the provided values into the heap and returns the modified heap. Autovivifies an uninitialized heap.
 
