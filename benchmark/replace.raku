@@ -1,16 +1,13 @@
 use BinaryHeap <MinHeap>;
 
-constant m = 2**16;
 constant n = 2**16;
 
-sub roll(\n) {
-    my \values = (^n).roll(n);
-    values.elems; # reifies
-    return values;
+sub input(\n) {
+    eager (^n).roll(n)
 }
 
 sub heap(\n, $type) {
-    my \values = roll(n);
+    my \values = input(n);
     do given $type {
         when 'Mu'  { MinHeap.new(values)            }
         when 'Int' { MinHeap.new(my Int @ = values) } 
@@ -19,12 +16,12 @@ sub heap(\n, $type) {
     }
 }
 
-sub MAIN(Int $n = n, Int $m = m, Str :$array-of = 'Mu') {
+sub MAIN(Int $n = n, Str :$array-of = 'Mu') {
     srand(42); # make roll reproducible
-    
+
+    my \values = input($n);
     my $heap = heap($n, $array-of);
-    my \values = roll($m);
-    print "Replace $m times the top of a heap with $n elems: ";
+    print "Replace $n times the top of a heap with $n elems: ";
 
     my $time = now;
     $heap.replace($_) for values;
