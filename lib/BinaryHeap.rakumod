@@ -445,10 +445,10 @@ Defined as:
     method extract($n?)
 
 Returns a C<Seq> that generates values by popping elements from the heap until
-C<$n> elements were extracted or the heap is empty. If no values are pushed onto
-the heap before the C<Seq> is exhausted, the sequence will be in non-decreasing
-order if called on a I<min-heap>, and in non-increasing order if called on a
-I<max-heap>.
+C<$n> elements have been extracted or the heap is empty. If no values are pushed
+onto the heap before the C<Seq> is exhausted, the values are produced in
+non-decreasing order if called on a I<min-heap>, and in non-increasing order if
+called on a I<max-heap>.
 
 =head2 method gist
 
