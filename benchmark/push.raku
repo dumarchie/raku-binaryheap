@@ -16,7 +16,7 @@ sub MAIN(Int $n = n, Str :$array-of = 'Mu') {
     
     my \values = eager (^$n).roll($n);
     my $m = $n div 2;
-    my $heap = heap(values.pick($m), $array-of);
+    my $heap = heap((^$n).roll($m), $array-of);
     print "Push $n values onto a heap with $m elems: ";
 
     my $time = now;
