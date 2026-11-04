@@ -3,7 +3,6 @@ use BinaryHeap <MinHeap>;
 constant n = 2**19;
 
 sub input(\n, $type) {
-    srand(42); # make roll reproducible
     my \seq = (^n).roll(n);
     my \values = do given $type {
         when Str:U { seq.list       }
@@ -18,11 +17,14 @@ sub input(\n, $type) {
 }
 
 sub MAIN(Int $n = n, Str :$array-of, Bool :$in-place) {
+    srand(42); # make roll reproducible
+
     my \values = input($n, $array-of);
     print "Heapify fully reified {values.^name} with $n elems: ";
 
     my $time = now;
     my $heap = MinHeap.new(values, :$in-place);
     $time = now - $time;
+
     printf "%0.2fms\n", $time * 1000;
 }
