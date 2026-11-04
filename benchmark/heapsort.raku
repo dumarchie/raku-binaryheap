@@ -3,7 +3,6 @@ use BinaryHeap <&heapsort>;
 constant n = 2**16;
 
 sub input(\n, $type) {
-    srand(42); # make roll reproducible
     my \seq = (^n).roll(n);
     my \values = do given $type {
         when Str:U { seq.list       }
@@ -17,13 +16,15 @@ sub input(\n, $type) {
     return values;
 }
 
-
 sub MAIN(Int $n = n, Str :$array-of) {
+    srand(42); # make roll reproducible
+
     my \values = input($n, $array-of);
     print "Heapsort {values.^name} with $n elems: ";
 
     my $time = now;
     heapsort values;
     $time = now - $time;
+
     printf "%0.2fms\n", $time * 1000;
 }
