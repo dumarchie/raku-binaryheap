@@ -6,7 +6,7 @@ use BinaryHeap <MinHeap>;
 constant m = 2**19;
 constant n = 2**18;
 
-sub roll(\n) {
+sub input(\n) {
     eager (^n).roll(n);
 }
 
@@ -24,7 +24,7 @@ sub MAIN(Int $n = n, Int $m = m, Str :$array-of = 'Mu', Bool() :$with-heap) {
     srand(42); # make roll reproducible
     
     my $heap = heap($n, $array-of);
-    my \values = $with-heap ?? heap($m, $array-of) !! roll($m);
+    my \values = $with-heap ?? heap($m, $array-of) !! input($m);
     print "Merge {values.^name} with $m elems into a heap with $n elems: ";
 
     my $time = now;

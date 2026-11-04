@@ -3,11 +3,11 @@ use BinaryHeap <MinHeap>;
 constant n = 2**16;
 
 sub input(\n) {
-    eager (^n).roll(n)
+    eager (^n).roll(n);
 }
 
 sub heap(\n, $type) {
-    my \values = input(n);
+    my \values = (^n).roll(n);
     do given $type {
         when 'Mu'  { MinHeap.new(values)            }
         when 'Int' { MinHeap.new(my Int @ = values) } 
