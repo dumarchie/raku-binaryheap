@@ -1,8 +1,9 @@
 use BinaryHeap <MinHeap>;
 
-constant n = 2**16;
+constant size = 2**16;
 
-sub heap(\values, $type) {
+sub heap($size, $type) {
+    my \values = (^$size).roll($size);
     do given $type {
         when 'Mu'  { MinHeap.new(values)            }
         when 'Int' { MinHeap.new(my Int @ = values) } 
@@ -11,16 +12,13 @@ sub heap(\values, $type) {
     }
 }
 
-sub MAIN(Int $n = n, Str :$array-of = 'Mu') {
+sub MAIN(Int $size = size, Str :$array-of = 'Mu') {
     srand(42); # make roll reproducible
 
-    my $m = ($n div 2) * 3;
-    my $heap = heap((^$n).roll($m), $array-of);
-    print "Pop $n values from a heap with $m elems: ";
+    my $heap = heap($size, $array-of);
+    print "Pop all values from a heap with $size elems: ";
 
-    my $time = now;
-    $heap.pop for ^$n;
-    $time = now - $time;
-
-    printf "%0.2fms\n", $time * 1000;
+    my $start = now;
+    $heap.pop for ^$size;
+    printf "%0.2fms\n", (now - $start) * 1000;
 }

@@ -2,7 +2,8 @@ use BinaryHeap <MinHeap>;
 
 constant size = 2**16;
 
-sub heap(\values, $type) {
+sub heap($size, $type) {
+    my \values = (^$size).roll($size);
     do given $type {
         when 'Mu'  { MinHeap.new(values)            }
         when 'Int' { MinHeap.new(my Int @ = values) } 
@@ -15,7 +16,7 @@ sub MAIN(Int $size = size, Int $n?, Str :$array-of = 'Mu') {
     srand(42); # make roll reproducible
 
     my &run;
-    my $heap = heap((^$size).roll($size), $array-of);
+    my $heap = heap($size, $array-of);
     if $n.defined {
         print "Extract up to $n values from a heap with $size elems: ";
         &run = { $heap.extract($n) };
