@@ -1,6 +1,6 @@
 use BinaryHeap <MinHeap>;
 
-constant n = 2**16;
+constant size = 2**16;
 
 sub heap(\values, $type) {
     do given $type {
@@ -11,16 +11,21 @@ sub heap(\values, $type) {
     }
 }
 
-sub MAIN(Int $n = n, Str :$array-of = 'Mu') {
+sub MAIN(Int $size = size, Int $n?, Str :$array-of = 'Mu') {
     srand(42); # make roll reproducible
 
-    my $m = ($n div 2) * 3;
-    my $heap = heap((^$n).roll($m), $array-of);
-    print "Extract $n values from a heap with $m elems: ";
+    my &run;
+    my $heap = heap((^$size).roll($size), $array-of);
+    if $n.defined {
+        print "Extract up to $n values from a heap with $size elems: ";
+        &run = { $heap.extract($n) };
+    }
+    else {
+        print "Extract all values from a heap with $size elems: ";
+        &run = { $heap.extract };
+    }
 
-    my $time = now;
-    $heap.extract($n);
-    $time = now - $time;
-
-    printf "%0.2fms\n", $time * 1000;
+    my $start = now;
+    run();
+    printf "%0.2fms\n", (now - $start) * 1000;
 }
