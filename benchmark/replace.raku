@@ -1,9 +1,9 @@
 use BinaryHeap <MinHeap>;
 
-constant size = 2**16;
+constant elems = 2**16;
 
 sub heap($size, $type) {
-    my \values = (^$size).roll($size);
+    my \values = (^elems).roll($size);
     do given $type {
         when 'Mu'  { MinHeap.new(values)            }
         when 'Int' { MinHeap.new(my Int @ = values) } 
@@ -12,11 +12,11 @@ sub heap($size, $type) {
     }
 }
 
-sub MAIN(Int $size = size, Int $n = size, Str :$array-of = 'Mu') {
+sub MAIN(Int $size = elems, Int $n = elems, Str :$array-of = 'Mu') {
     srand(42); # make roll reproducible
 
     my $heap = heap($size, $array-of);
-    my \new = eager (^$size).roll($n);
+    my \new = eager (^elems).roll($n);
     print "Replace $n times the top of a heap with $size elems: ";
 
     my $start = now;
