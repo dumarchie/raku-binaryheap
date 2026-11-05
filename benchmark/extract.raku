@@ -1,9 +1,9 @@
 use BinaryHeap <MinHeap>;
 
-constant elems = 2**16;
+constant n-unique = 2**16;
 
 sub heap($size, $type) {
-    my \values = (^elems).roll($size);
+    my \values = (^n-unique).roll($size);
     do given $type {
         when 'Mu'  { MinHeap.new(values)            }
         when 'Int' { MinHeap.new(my Int @ = values) } 
@@ -12,7 +12,7 @@ sub heap($size, $type) {
     }
 }
 
-sub MAIN(Int $size = elems, Int $n?, Str :$array-of = 'Mu') {
+sub MAIN(Int $size = n-unique, Int $n?, Str :$array-of = 'Mu') {
     srand(42); # make roll reproducible
 
     my &run;

@@ -1,8 +1,10 @@
 use BinaryHeap <MinHeap>;
 
+constant n-unique = 2**16;
 constant n = 2**19;
 
-sub heap(\values, $type) {
+sub heap($size, $type) {
+    my \values = (^n-unique).roll($size);
     do given $type {
         when 'Mu'  { MinHeap.new(values)            }
         when 'Int' { MinHeap.new(my Int @ = values) } 
@@ -11,17 +13,14 @@ sub heap(\values, $type) {
     }
 }
 
-sub MAIN(Int $n = n, Str :$array-of = 'Mu') {
+sub MAIN(Int $size = 0, Int $n = n, Str :$array-of = 'Mu') {
     srand(42); # make roll/pick reproducible
     
-    my \values = eager (^$n).roll($n);
-    my $m = $n div 2;
-    my $heap = heap((^$n).roll($m), $array-of);
-    print "Push $n values onto a heap with $m elems: ";
+    my $heap = heap($size, $array-of);
+    my \values = eager (^n-unique).roll($n);
+    print "Push $n values onto a heap with $size elems: ";
 
-    my $time = now;
+    my $start = now;
     $heap.push($_) for values;
-    $time = now - $time;
-
-    printf "%0.2fms\n", $time * 1000;
+    printf "%0.2fms\n", (now - $start) * 1000;
 }
