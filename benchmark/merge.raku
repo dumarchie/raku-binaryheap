@@ -1,17 +1,14 @@
 use BinaryHeap <MinHeap>;
 
-# For stable performance:
-# set MVM_SPESH_BLOCKING=1
+constant n-unique = 2**16;
+constant n = 2**19;
 
-constant m = 2**19;
-constant n = 2**18;
-
-sub input(\n) {
-    eager (^n).roll(n);
+sub values($n) {
+    (^n-unique).roll($n);
 }
 
-sub heap(\n, $type) {
-    my \values = (^n).roll(n);
+sub heap($size, $type) {
+    my \values = values($size);
     do given $type {
         when 'Mu'  { MinHeap.new(values)            }
         when 'Int' { MinHeap.new(my Int @ = values) } 
@@ -20,16 +17,14 @@ sub heap(\n, $type) {
     }
 }
 
-sub MAIN(Int $n = n, Int $m = m, Str :$array-of = 'Mu', Bool() :$with-heap) {
+sub MAIN(Int $n = n, Int $m = n, Str :$array-of = 'Mu', Bool() :$with-heap) {
     srand(42); # make roll reproducible
     
     my $heap = heap($n, $array-of);
-    my \values = $with-heap ?? heap($m, $array-of) !! input($m);
+    my \values = $with-heap ?? heap($m, $array-of) !! values($m);
     print "Merge {values.^name} with $m elems into a heap with $n elems: ";
 
-    my $time = now;
+    my $start = now;
     $heap.merge(values);
-    $time = now - $time;
-
-    printf "%0.2fms\n", $time * 1000;
+    printf "%0.2fms\n", (now - $start) * 1000;
 }
