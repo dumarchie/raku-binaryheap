@@ -14,7 +14,7 @@ sub heap($size, $type) {
 }
 
 sub MAIN(Int $size = 0, Int $n = n, Str :$array-of = 'Mu') {
-    srand(42); # make roll/pick reproducible
+    srand(42); # make roll reproducible
     
     my $heap = heap($size, $array-of);
     my \values = eager (^n-unique).roll($n);
