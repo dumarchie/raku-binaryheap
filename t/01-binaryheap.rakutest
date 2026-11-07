@@ -1,6 +1,7 @@
 use Test;
 plan 10;
 
+use lib 'lib';
 use BinaryHeap <MinHeap MaxHeap>;
 
 sub heap-ok(\heap, \values, $desc?) {

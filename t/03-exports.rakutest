@@ -1,6 +1,7 @@
 use Test;
 plan 7;
 
+use lib 'lib';
 use BinaryHeap <MaxHeap MinHeap &heapsort>;
 
 subtest 'infix eqv', {
