@@ -1,8 +1,6 @@
 use Test;
 plan 1;
 
-use lib 'lib';
-
 if ?%*ENV<AUTHOR_TESTING> {
     require Test::META <&meta-ok>;
     meta-ok;
