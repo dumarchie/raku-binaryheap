@@ -1,5 +1,9 @@
-2.1.2
-    - Speed up traversal
+2.1.2 2026-11-13
+    - Performance improvements:
+        - make push 39% faster
+        - make replace 18% faster
+        - make traversal 11% faster
+        - make merge 8% faster
 2.1.1 2026-10-31
     - Support efficient merge of values produced by Iterable
 2.1.0 2026-10-29
