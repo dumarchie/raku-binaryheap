@@ -406,8 +406,8 @@ Defined as:
     sub max-heap(&infix:<cmp>, +values, Bool() :$in-place)
 
 Returns a custom C<GenHeap[* cmp * == More]> instance storing the provided
-values. If C<values> is a single, non-itemized array, the C<:in-place> adverb
-causes the array to be heapified in place. By default, an array is cloned before
+values. If C<values> are provided as a bare array, the array is heapified
+in-place if C<$in-place> is true. By default, a bare array is cloned before
 heapification.
 
 =head2 sub min-heap
@@ -417,8 +417,8 @@ Defined as:
     sub min-heap(&infix:<cmp>, +values, Bool() :$in-place)
 
 Returns a custom C<GenHeap[* cmp * == Less]> instance storing the provided
-values. If C<values> is a single, non-itemized array, the C<:in-place> adverb
-causes the array to be heapified in place. By default, an array is cloned before
+values. If C<values> are provided as a bare array, the array is heapified
+in-place if C<$in-place> is true. By default, a bare array is cloned before
 heapification.
 
 =head1 METHODS
@@ -478,10 +478,10 @@ Defined as:
 
     method new(+values, Bool() :$in-place)
 
-Constructs a new heap containing the provided values. If C<values> is a single,
-non-itemized array, the C<:in-place> adverb causes the array to be heapified in
-place. By default, an array is cloned before heapification. In either case, the
-array's type constraint applies to all elements in the heap.
+Constructs a new heap containing the provided values. If C<values> are provided
+as a bare array, the array is heapified in-place if C<$in-place> is true. By
+default, a bare array is cloned before heapification. In both cases, the array's
+type constraint applies to all elements in the heap.
 
 =head2 method of
 
