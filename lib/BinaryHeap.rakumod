@@ -112,6 +112,7 @@ role GenHeap[&infix:<tops>] does Iterable is export {
     }
 
     # Merge values into a heap
+    # Note that append + heapify was shown to be slower
     proto method merge(|) {*}
     multi method merge(GenHeap:U $self is rw: |values) {
         $self = self.new(|values);
