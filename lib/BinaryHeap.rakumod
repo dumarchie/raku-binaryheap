@@ -20,18 +20,49 @@ role GenHeap[&infix:<tops>] does Iterable is export {
     # the array may contain additional elements to accommodate a heapsort.
     has @!array;
     has int $!elems;
-    has @!descent; # reusable node array for sift-down
+    has @!descent;  # reusable path for sift-down
     method !SET-SELF(@values, $!elems = @values.elems) {
         @!array := @values;
         self;
     }
 
-    # Sift down with bounce to reduce the number of comparisons
-    # Define a descent from a node at a given position, by selecting the top
-    # priority child at each level. Then shorten the descent until the final
-    # node can contain the value of the first node without violating the heap
-    # condition. Then assign each node the value of its successor, and assign
-    # the last node the value of the first node.
+    # Construct a heap with zero or more elements
+    proto method new(|) {*}
+    multi method new() { self.CREATE }
+    multi method new(**@values) {
+        self.CREATE!HEAPIFY(@values);
+    }
+    # A Slip is an Iterable that should slip even when itemized
+    multi method new(Slip \values) {
+        self.CREATE!HEAPIFY(values.Array);
+    }
+    multi method new(Iterable \arg, Bool() :$in-place) {
+        my @values;
+        if arg.VAR !=== arg {
+            @values = arg;
+        }
+        elsif arg ~~ Array|array {
+            @values := $in-place ?? arg !! arg.clone;
+        }
+        else {
+            @values := arg.Array;
+        }
+        self.CREATE!HEAPIFY(@values);
+    }
+    method !HEAPIFY(@values) {
+        self!SET-SELF(@values);
+        
+        my int $pos = ($!elems - 2) div 2; # last internal node
+        self!sift-down($pos--) while $pos >= 0;
+        self;
+    }
+
+    # **Sift down with bounce** to reduce the number of comparisons. Define a
+    # path down from a node at a given position, by selecting the top priority
+    # child at each level. Shorten the path until the final node can contain
+    # the value of the source node without violating the heap condition. Then
+    # assign each node the value of its successor, and assign the original
+    # value of the source node to the last node.
     method !sift-down(int $pos is copy --> Nil) {
         my $node := @!array[$pos];
         @!descent.BIND-POS(my int $depth, $node);
@@ -70,37 +101,6 @@ role GenHeap[&infix:<tops>] does Iterable is export {
 
         # assign the original value of the first node to the final node
         $node = $value;
-    }
-
-    # Construct a heap with zero or more values
-    proto method new(|) {*}
-    multi method new() { self.CREATE }
-    multi method new(**@values) {
-        self.CREATE!HEAPIFY(@values);
-    }
-    # A Slip is an Iterable that should slip even when itemized
-    multi method new(Slip \values) {
-        self.CREATE!HEAPIFY(values.Array);
-    }
-    multi method new(Iterable \arg, Bool() :$in-place) {
-        my @values;
-        if arg.VAR !=== arg {
-            @values = arg;
-        }
-        elsif arg ~~ Array|array {
-            @values := $in-place ?? arg !! arg.clone;
-        }
-        else {
-            @values := arg.Array;
-        }
-        self.CREATE!HEAPIFY(@values);
-    }
-    method !HEAPIFY(@values) {
-        self!SET-SELF(@values);
-        
-        my int $pos = (self.elems - 2) div 2; # last internal node
-        self!sift-down($pos--) while $pos >= 0;
-        self;
     }
 
     # A heap has the type constraint of the underlying array
