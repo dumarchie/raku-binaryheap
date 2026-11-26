@@ -21,13 +21,8 @@ role GenHeap[&infix:<tops>] does Iterable is export {
     has @!array;
     has int $!elems;
     has @!descent; # reusable node array for sift-down
-    method !SET-SELF(@array, $elems = @array.elems) {
-        @!array := @array;
-        $!elems = $elems;
-        if $!elems > 1 { # heapify array
-            my int $pos = ($!elems - 2) div 2; # last internal node
-            self!sift-down($pos--) while $pos >= 0;
-        }
+    method !SET-SELF(@values, $!elems = @values.elems) {
+        @!array := @values;
         self;
     }
 
@@ -81,11 +76,11 @@ role GenHeap[&infix:<tops>] does Iterable is export {
     proto method new(|) {*}
     multi method new() { self.CREATE }
     multi method new(**@values) {
-        self.CREATE!SET-SELF(@values);
+        self.CREATE!HEAPIFY(@values);
     }
     # A Slip is an Iterable that should slip even when itemized
     multi method new(Slip \values) {
-        self.CREATE!SET-SELF(values.Array);
+        self.CREATE!HEAPIFY(values.Array);
     }
     multi method new(Iterable \arg, Bool() :$in-place) {
         my @values;
@@ -98,7 +93,14 @@ role GenHeap[&infix:<tops>] does Iterable is export {
         else {
             @values := arg.Array;
         }
-        self.CREATE!SET-SELF(@values);
+        self.CREATE!HEAPIFY(@values);
+    }
+    method !HEAPIFY(@values) {
+        self!SET-SELF(@values);
+        
+        my int $pos = (self.elems - 2) div 2; # last internal node
+        self!sift-down($pos--) while $pos >= 0;
+        self;
     }
 
     # A heap has the type constraint of the underlying array
