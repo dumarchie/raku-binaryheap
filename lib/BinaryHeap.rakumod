@@ -129,7 +129,7 @@ role GenHeap[&infix:<tops>] does Iterable is export {
         arg.VAR === arg
           ?? self!insert-iterable(arg)
           !! self!insert(arg);
-   }
+    }
 
     # Extract a single value from a heap
     proto method pop() {*}
@@ -140,14 +140,13 @@ role GenHeap[&infix:<tops>] does Iterable is export {
         $!elems > 0 ?? self.extract-one !! self.WHAT.pop;
     }
     method extract-one() is implementation-detail {
-        $!elems > 1
-          ?? self!swap(@!array[--$!elems])
-          !! $!elems == 1 ?? @!array[--$!elems] !! IterationEnd;
+        my $value = @!array[--$!elems]:delete;
+        $!elems > 0 ?? self!swap($value) !! $value;
     }
-    method !swap(Mu \new) {
+    method !swap(Mu $new) {
         my $node := @!array[0];
         my $value = $node;
-        $node = new;
+        $node = $new;
         self!sift-down(0);
         $value;
     }
@@ -155,7 +154,9 @@ role GenHeap[&infix:<tops>] does Iterable is export {
     # Extract a Seq of values from a heap
     my class Extractor does Iterator {
         has $.heap;
-        method pull-one() { $!heap.extract-one }
+        method pull-one() {
+            $!heap ?? $!heap.extract-one !! IterationEnd;
+        }
     }
 
     proto method extract(|) {*}
